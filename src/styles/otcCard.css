@@ -1,0 +1,98 @@
+.bg-custom-color {
+    background-color: #1b1e2f; 
+  }
+
+  .custom-gray{
+    color:#5c5d6c;
+  }
+  .custon-gray-bg{
+    background-color: #222735;
+  }
+
+
+  .custon-text{
+    color: #1b1e2f; 
+  }
+  .progress-ring__circle {
+    transition: stroke-dashoffset 0.35s;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+.MarketCardHover:hover{
+  .HoverLogo{
+    color: yellow;
+    opacity: 0.8 !important;
+  }
+}
+
+.MarketCardHover:hover .nft-icon {
+  color: yellow;
+  opacity: 1;
+}
+
+.MarketCardHover:hover .nft-path {
+  fill: yellow;
+  stroke: yellow;
+  opacity: 1;
+}
+
+.nft-path {
+  fill: rgb(255, 255, 255);
+  stroke: rgb(255, 255, 255);
+  opacity: 1;
+}
+nft-icon {
+  color: rgb(255, 255, 255);
+  opacity: 1;
+}
+
+
+.container {
+  position: relative;
+  margin-top: 6px;
+}
+
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+}
+
+.checkmark {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 50%;
+  
+}
+
+.container input:checked ~ .checkmark {
+  background-color: black;
+  border: 2px solid rgb(240, 201, 74);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  background-color: rgb(240, 201, 74);
+  display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.container .checkmark:after {
+  top: 5px;
+  left: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(240, 201, 74);
+}

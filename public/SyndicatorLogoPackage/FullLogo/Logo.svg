@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 490.58 94.86">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke-width: 0px;
+      }
+
+      .cls-5 {
+        font-size: 48px;
+      }
+
+      .cls-5, .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-5, .cls-6 {
+        font-family: EternalLogo-Regular, 'Eternal Logo';
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-4, .cls-6 {
+        fill: #393939;
+      }
+
+      .cls-6 {
+        font-size: 30px;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="265.13" y1="-69.41" x2="252.67" y2="-91.01" gradientTransform="translate(-240.08 135.11)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#393939"/>
+      <stop offset=".5" stop-color="#373737"/>
+      <stop offset=".68" stop-color="#303030"/>
+      <stop offset=".81" stop-color="#242424"/>
+      <stop offset=".92" stop-color="#131313"/>
+      <stop offset="1" stop-color="#000"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="334.74" y1="-63.36" x2="322.27" y2="-84.95" gradientTransform="translate(374.6 -34.18) rotate(-180)" xlink:href="#linear-gradient"/>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g id="Triangle_1" data-name="Triangle 1">
+      <polygon class="cls-1" points="25.21 37.17 .27 51.57 25.29 66.13 25.21 37.17"/>
+    </g>
+    <g id="Triangle_1-2" data-name="Triangle 1">
+      <polygon class="cls-4" points="39.62 28.75 39.71 57.7 64.65 43.3 39.62 28.75"/>
+    </g>
+    <g id="Rectangle_6_copy_4" data-name="Rectangle 6 copy 4">
+      <polygon class="cls-3" points="0 81.53 23.4 94.86 64.8 70.96 64.95 44.03 0 81.53"/>
+    </g>
+    <g id="Rectangle_6_copy_4-2" data-name="Rectangle 6 copy 4">
+      <polygon class="cls-3" points="41.55 0 .15 23.9 0 50.84 64.95 13.34 41.55 0"/>
+    </g>
+    <g id="Triangle_1-3" data-name="Triangle 1">
+      <polygon class="cls-2" points="39.62 28.75 39.71 57.7 64.65 43.3 39.62 28.75"/>
+    </g>
+    <text class="cls-5" transform="translate(81.81 46.94)"><tspan x="0" y="0">Syndicator</tspan></text>
+    <text class="cls-6" transform="translate(382.34 76.94)"><tspan x="0" y="0">Labs</tspan></text>
+  </g>
+</svg>

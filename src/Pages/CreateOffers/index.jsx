@@ -1,5 +1,14 @@
+import OfferMarketCard from "../../components/OfferCard";
+
 const CreateOffers = () => {
-    return <h1>createOffers</h1>;
+    return <>
+     <div className="h-full flex  justify-center w-full  ">
+  
+  {" "}
+ <OfferMarketCard />
+
+</div>
+    </>
   };
   
   export default CreateOffers;

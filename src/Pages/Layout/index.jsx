@@ -27,15 +27,15 @@ const Layout = () => {
 
   return (
     <>
-      <header className=" fixed top-0 h-20 w-full">
+      <header className=" fixed top-0 h-20 w-full z-10">
         <div className=" h-full w-full border-b-[1px] border-[#79797c] bg-[#000000] ">
-          <div className=" px-5 h-full w-full flex items-center justify-between">
+          <div className=" ps-5 pe-2 sm:px-5 h-full w-full flex items-center justify-between">
             <div>
                    <img  src="/logo.png" alt="logo" />
             </div>
 
             <div>
-                <button className=" text-white bg-[#363a41] px-3 py-1 border border-white border-opacity-50 rounded-md">Connect Wallet</button>
+                <button className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-75 sm:scale-100  border border-white border-opacity-50 rounded-md">Connect Wallet</button>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@ const Layout = () => {
           data-drawer-toggle="default-sidebar"
           aria-controls="default-sidebar"
           type="button"
-          className=" z-50 absolute left-0 top-2 items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden  dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          className=" z-50 fixed left-0 top-2 items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden  dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
         >
           <svg
             className="w-6 h-6"
@@ -70,7 +70,7 @@ const Layout = () => {
           id="default-sidebar"
           className={`fixed top-20 left-0 z-40 text-white w-64 h-screen transition-transform ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } sm:translate-x-0 bg-[#101116] border-[#47484b] border-r-4`}
+          } md:translate-x-0 bg-[#101116] border-[#47484b] border-r-4`}
           aria-label="Sidebar"
         >
           <div className="h-full px-3 py-4 overflow-y-auto ">
@@ -158,10 +158,10 @@ const Layout = () => {
         </aside>
 
         <div
-          style={{ height: "calc(100vh - 80px)" }}
-          className="p-4 sm:ml-64 relative top-20 bg-[#101116] -z-10"
+          style={{ minHeight: "calc(100vh - 80px)" }}
+          className=" p-1 md:ml-64 relative top-20 bg-[#101116] "
         >
-          <div className="p-4 h-full w-full text-white">
+          <div className=" h-full w-full text-white">
             <Outlet />
           </div>
         </div>
