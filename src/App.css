@@ -4,3 +4,92 @@
   box-sizing: border-box;
 }
 
+.box1 {
+  position: relative;
+  color: white; /* This will be controlled in the pseudo-element */
+  border-radius: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  overflow: hidden; /* To prevent the pseudo-element from overflowing */
+}
+
+.box1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/staroo.png");
+  background-position: 130% 40px;
+  background-size: 200px;
+  background-repeat: no-repeat;
+  opacity: 0.2; /* Set opacity to 0.2 */
+  z-index: 0; /* Ensure it is behind the text */
+}
+
+.box1 p {
+  position: relative;
+  z-index: 1; /* Ensure text is above the background image */
+}
+
+.box2 {
+  position: relative;
+  color: white;/* This will be controlled in the pseudo-element */
+  border-radius: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  overflow: hidden; /* To prevent the pseudo-element from overflowing */
+}
+
+.box2::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/line.png");
+  background-position: 110% 50%;
+  background-size: 140px;
+  background-repeat: no-repeat;
+  opacity: 0.2; /* Set opacity to 0.2 */
+  z-index: 0; /* Ensure it is behind the text */
+}
+
+.box2 p {
+  position: relative;
+  z-index: 1; /* Ensure text is above the background image */
+}
+
+
+
+
+.box3 {
+  position: relative;
+  color: white; /* This will be controlled in the pseudo-element */
+  border-radius: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  overflow: hidden; /* To prevent the pseudo-element from overflowing */
+}
+
+.box3::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/coin.png");
+  background-position: 110% 35px;
+  background-size: 140px;
+  background-repeat: no-repeat;
+  filter: opacity(0.2); /* Set opacity to 0.2 */
+  z-index: 0; /* Ensure it is behind the text */
+}
+
+.box3 p {
+  position: relative;
+  z-index: 1; /* Ensure text is above the background image */
+}

@@ -1,4 +1,4 @@
-import { BsClockHistory } from "react-icons/bs"; 
+
 import { RxPerson } from "react-icons/rx"; 
 import { RiFlashlightFill } from "react-icons/ri"; 
 import { AiOutlineBarChart } from "react-icons/ai"; 
@@ -93,6 +93,7 @@ const Layout = () => {
              <li className=" text-white rounded-lg mt-1 transition-all">
                 <Link
                   to={"/"}
+                  onClick={toggleSidebar}
                   className="flex items-center ps-3 p-2  rounded-lg group"
                 >
                   <BsFillEyeFill className="flex-shrink-0 w-5 h-5 opacity-65 " />
@@ -101,6 +102,7 @@ const Layout = () => {
               </li>
               <li className=" text-white rounded-lg mt-1 transition-all">
                 <Link
+                onClick={toggleSidebar}
                   to={"createoffers"}
                   className="flex items-center ps-3 p-2 rounded-lg group"
                 >
@@ -131,22 +133,12 @@ const Layout = () => {
              <li className=" text-white rounded-lg mt-1 transition-all">
                 <Link
                   to={"/myprofile"}
+                  onClick={toggleSidebar}
                   className="flex items-center ps-3 p-2  rounded-lg group"
                 >
                   
                   <RxPerson className="flex-shrink-0 w-5 h-5 opacity-65 "/>
                   <span className="flex-1 ms-3 whitespace-nowrap">My Profile</span>
-                </Link>
-              </li>
-              <li className=" text-white rounded-lg mt-1 transition-all">
-                <Link
-                  to={"/myhistory"}
-                  className="flex items-center ps-3 p-2 rounded-lg group"
-                >
-                    
-                    <BsClockHistory className="flex-shrink-0 w-5 h-5 opacity-65 "/>
-                  {/* <IoCreateOutline className="flex-shrink-0 w-5 h-5 opacity-65 " /> */}
-                  <span className="flex-1 ms-3 whitespace-nowrap">My History</span>
                 </Link>
               </li>
           </>

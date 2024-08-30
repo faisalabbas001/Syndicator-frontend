@@ -56,8 +56,10 @@ nft-icon {
   position: absolute;
   opacity: 0;
   cursor: pointer;
-  height: 20px;
-  width: 20px;
+  height: 60px;
+  width: 100%;
+  background-color: aqua;
+  z-index: 10000;
 }
 
 .checkmark {

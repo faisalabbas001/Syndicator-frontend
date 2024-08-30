@@ -6,7 +6,6 @@ const Home = lazy(()=> import('./Pages/ViewOffers'))
 const NoPage = lazy(()=> import('./Pages/Not-found'))
 const CreateOffers = lazy(()=> import('./Pages/CreateOffers'))
 const MyProfile = lazy(()=> import('./Pages/MyProfile'))
-const MyHistory = lazy(()=> import('./Pages/Myhistory'))
 
 
 export default function App() {
@@ -18,7 +17,6 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/createoffers" element={<CreateOffers />} />
           <Route path="/myprofile" element={<MyProfile />} />
-          <Route path="/myhistory" element={<MyHistory />} />
 
           <Route path="*" element={<NoPage />} />
         </Route>

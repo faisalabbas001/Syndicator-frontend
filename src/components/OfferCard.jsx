@@ -13,18 +13,14 @@ import { FaAirbnb } from "react-icons/fa";
 import { BiBitcoin } from "react-icons/bi"; 
 import { BsPCircle } from "react-icons/bs"; 
 import { TbArrowZigZag } from "react-icons/tb"; 
-import React, { useState } from "react";
-import OTCMarketCard from "../components/otcCard";
+import  { useState } from "react";
 import { FaEthereum } from "react-icons/fa";
 import "react-step-progress-bar/styles.css";
-import { ProgressBar, Step } from "react-step-progress-bar";
-import { FaCheckCircle } from "react-icons/fa";
-import { PiCheckCircleThin } from "react-icons/pi";
-import { GoCheckCircleFill } from "react-icons/go";
+// import { ProgressBar, Step } from "react-step-progress-bar";
+// import { GoCheckCircleFill } from "react-icons/go";
 import { FiChevronDown } from "react-icons/fi";
 import { CiCircleInfo } from "react-icons/ci";
 import { FaLockOpen, FaScaleBalanced } from "react-icons/fa6";
-import { RiNftFill } from "react-icons/ri";
 import "../styles/otcCard.css"
 import DeactivateModal from "./Popup";
 
@@ -76,7 +72,7 @@ const OfferMarketCard = () => {
      mx-1 md:mx-0 mb-2 "
       >
         <div className=" rounded-md  mb-5 md:mb-0">
-        <span style={{marginBottom: "-10px"}} className=" ms-[9px] font-bold text-[12px] py-[2px] bg-[#64d5ff] text-black px-[6px] rounded-full flex justify-center items-center w-fit">
+        <span className=" mt-5 sm:-mb-3 sm:ms-[9px] font-bold text-[12px] py-[2px] bg-[#64d5ff] text-black px-[6px] rounded-full flex justify-center items-center w-fit">
             STEP {activeStep}/3
         </span>
 
@@ -132,43 +128,43 @@ const OfferMarketCard = () => {
   );
 };
 
-const CustomProgressBar = ({ progress }) => {
-  return (
-    <>
+// const CustomProgressBar = ({ progress }) => {
+//   return (
+//     <>
     
-    <ProgressBar  percent={progress} filledBackground="#22c55e	" height="5%" className="z-[9999]">
-      <Step transition="scale">
-        {({ accomplished }) => (
-          <GoCheckCircleFill
-            size={40}
-            color={accomplished ? "#22c55e	" : "#CCCCCC"}
-            style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
-          />
-        )}
-      </Step>
-      <Step transition="scale">
-        {({ accomplished }) => (
-          <GoCheckCircleFill
-            size={40}
-            color={accomplished ? "#22c55e	" : "#CCCCCC"}
-            style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
-          />
-        )}
-      </Step>
-      <Step transition="scale">
-        {({ accomplished }) => (
-          <GoCheckCircleFill
-            size={40}
-            color={accomplished ? "#22c55e	" : "#CCCCCC"}
-            style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
-          />
-        )}
-      </Step>
-    </ProgressBar>
+//     <ProgressBar  percent={progress} filledBackground="#22c55e	" height="5%" className="z-[9999]">
+//       <Step transition="scale">
+//         {({ accomplished }) => (
+//           <GoCheckCircleFill
+//             size={40}
+//             color={accomplished ? "#22c55e	" : "#CCCCCC"}
+//             style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
+//           />
+//         )}
+//       </Step>
+//       <Step transition="scale">
+//         {({ accomplished }) => (
+//           <GoCheckCircleFill
+//             size={40}
+//             color={accomplished ? "#22c55e	" : "#CCCCCC"}
+//             style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
+//           />
+//         )}
+//       </Step>
+//       <Step transition="scale">
+//         {({ accomplished }) => (
+//           <GoCheckCircleFill
+//             size={40}
+//             color={accomplished ? "#22c55e	" : "#CCCCCC"}
+//             style={{ transform: "scale(0.8)", backgroundColor: "#1b1e2f" }}
+//           />
+//         )}
+//       </Step>
+//     </ProgressBar>
     
-    </>
-  );
-};
+//     </>
+//   );
+// };
 
 // const NftIcon = () => {
 //     return (
@@ -367,9 +363,9 @@ const Card1 = () => {
         <h4 className="text-white "> Select Market</h4>
       </div>
       <div className="grid grid-cols-2 gap-1 md:grid-cols-3 md:gap-x-2 md:gap-y-2">
-      <MarketCard logo={<TbArrowZigZag  />} title={"Pre-market"} subtitle={"Trade pre-TGE"} description={"token allocations."}/>
-        <MarketCard logo={<BsPCircle />} title={"Points Market"} subtitle={"Trade protocols"} description={"points."}/>
-        <MarketCard logo={<BiBitcoin />} title={"Runes Market"} subtitle={"Trade pre-launch"} description={"Runes allocations."}/>
+      <MarketCard logo={<TbArrowZigZag  />} title={"OTC"} subtitle={"Trade pre-TGE"} description={"token allocations."}/>
+        <MarketCard logo={<BsPCircle />} title={"Points Market"} subtitle={"Trade protocols"} description={"points."} sooncheck={"soon"}/>
+        <MarketCard logo={<BiBitcoin />} title={"Runes Market"} subtitle={"Trade pre-launch"} description={"Runes allocations."} sooncheck={"soon"}/>
         <MarketCard logo={<FaScaleBalanced/>} title={"Runes DEX"} subtitle={"Trade Runes OTC"} sooncheck={"soon"}/>
         <MarketCard logo={<NftIcon/>} title={"NFT Whitelists"} subtitle={"Trade Pre-Mint NFT "} description={"Whitelist"} sooncheck={"soon"}/>
         <MarketCard logo={<FaLockOpen/>} title={"Vesting Market"} subtitle={"Trade Vesting Token Ownership"} sooncheck={"soon"}/>
@@ -434,7 +430,7 @@ const Card2 = () => {
       {/* <h1 className="text-white text-3xl py-2">Buying</h1> */}
 
       {/* Buy */}
-      <h1 className=" text-[2rem] text-center sm:text-left font-semibold mb-4">Offer Details</h1>
+      <h1 className=" text-[2rem] sm:text-left font-semibold mb-4">Offer Details</h1>
       <div style={{ boxShadow: "0 1px 4px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)"}} className="flex flex-wrap px-2 sm:px-4 py-2 sm:p-4 bg-[#15161b] rounded-md justify-between w-full ">
   <div className="flex items-start flex-col w-full sm:w-auto">
     <div className="flex items-center w-full">
@@ -787,13 +783,13 @@ const Card3 = () => {
 
 const MarketCard = ({ logo, title, subtitle, description,sooncheck }) => {
   return (
-    <div className="border-2 MarketCardHover border-gray-800  hover:border-yellow-500 rounded-md py-6 relative ">
+    <div aria-disabled={true} className={`border-2 ${title.toString().includes("OTC")?"hover:border-yellow-500 MarketCardHover cursor-pointer border-gray-800 ": "border-gray-800 border-opacity-25 "}    rounded-md py-6 relative `}>
       <div className="flex items-center justify-center flex-col ">
-        <span className=" HoverLogo text-white opacity-50 font-bold text-[1.7rem]">{logo}</span>
-        <h5 className={`text-white text-sm  text-center ${title.toString().includes("NFT") ? "pt-1": "pt-3"}`}>{title}</h5>
-        <span className="text-xs text-center text-gray-400 my-1">{subtitle}</span>
-        <p className="text-xs text-center text-gray-400">{description} </p>
-        <span className=" absolute top-1 text-sm rounded-full px-2 right-1 bg-slate-500 bg-opacity-50 opacity-25">{sooncheck && sooncheck}</span>
+        <span className={`HoverLogo ${title.toString().includes("OTC")?"opacity-70": "opacity-10"} text-white  font-bold text-[1.7rem]`}>{logo}</span>
+        <h5 className={`text-white text-sm  text-center ${title.toString().includes("NFT") ? "pt-1": "pt-3"} ${title.toString().includes("OTC")?"opacity-70": "opacity-10"}`}>{title}</h5>
+        <span className={`text-xs text-center text-white my-1 ${title.toString().includes("OTC")?"opacity-40": "opacity-10"}`}>{subtitle}</span>
+        <p className={`text-xs text-center text-white ${title.toString().includes("OTC")?"opacity-40": "opacity-10"} `}>{description} </p>
+        <span className=" absolute top-1 text-sm rounded-full px-2 right-1 bg-slate-500 bg-opacity-55 opacity-15">{sooncheck && sooncheck}</span>
       </div>
     </div>
   );
@@ -801,7 +797,7 @@ const MarketCard = ({ logo, title, subtitle, description,sooncheck }) => {
 
 const Network = ({ name, icon }) => {
   return (
-    <div className="border border-gray-800  hover:border-yellow-500 rounded-md py-2 px-2 overflow-hidden">
+    <div className={`border ${name.toString().toLowerCase().includes("ethereum")?"border-gray-800  hover:border-yellow-500 cursor-pointer ":"border-gray-600 text-white opacity-10"} rounded-md py-2 px-2 overflow-hidden`}>
       <div className="flex items-center">
         {icon && icon}
         <span className="text-sm">{name}</span>

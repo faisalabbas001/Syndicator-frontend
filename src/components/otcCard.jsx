@@ -1,5 +1,4 @@
 import  { useState } from "react";
-import { FaArrowRight, FaArrowRightLong } from "react-icons/fa6";
 import { GoArrowRight } from "react-icons/go";
 
 import "../styles/otcCard.css";
