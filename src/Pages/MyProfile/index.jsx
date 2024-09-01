@@ -4,7 +4,22 @@ import { AiOutlineArrowUp } from "react-icons/ai";
 import { FaEthereum } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
 import "../../App.css"
+import { useState } from "react";
 const MyProfile = () => {
+   const [IsORderOpen, setIsOrderOpen] = useState(true);
+   const [IsOrderHistory,SetIsOrderHistory]= useState(false)
+
+  function ClickToCopy() {
+    let copyText = document.getElementById("myInput").textContent;
+    navigator.clipboard.writeText(copyText);
+    
+    let tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copied" ;
+}
+  function ChangeText() {
+    let tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copy";
+  }
   return (
     <>
       <div className=" h-full w-full bg-transparent p-1 sm:p-4 ">
@@ -21,12 +36,17 @@ const MyProfile = () => {
             />
           </div>
           <div className=" flex flex-col ">
-            <p className=" font-semibold text-[1.24rem] ">
+            <div className=" flex gap-2 items-center">
+            <p className=" font-semibold text-[1.24rem] " id="myInput">
               0xd4...7jd8{" "}
-              <span className=" inline-flex text-gray-500">
+            </p>
+            <div className="tooltip">
+              <span className=" inline-flex text-gray-500 cursor-pointer" onClick={ClickToCopy} onMouseOut={ChangeText}>
+              <span className="tooltiptext" id="myTooltip">Copy to clipboard</span>
                 <FaRegCopy />
               </span>
-            </p>
+              </div>
+            </div>
             <p className=" text-gray-500 text-[13px] border border-gray-700 rounded text-center w-fit   pe-2">
               {" "}
               <span className=" inline-flex ps-2 text-gray-500">
@@ -63,15 +83,16 @@ const MyProfile = () => {
         
         <div className="  min-h-[38rem] rounded-[10px] bg-opacity-20 bg-[#333232] w-full flex flex-col gap-y-3 p-2 sm:p-5">
             
-         <div className=" w-fit h-auto flex flex-wrap py-2 ps-2 bg-[#23232d] bg-opacity-80 rounded-md items-center justify-evenly gap-2">
-           <div className=" inline-flex items-center bg-black bg-opacity-45 px-3 py-1 rounded" >
+         <div className=" w-fit h-auto flex flex-wrap py-2 px-2 bg-[#23232d] bg-opacity-80 rounded-md items-center justify-evenly gap-2">
+           <div onClick={()=>{setIsOrderOpen(true);
+            SetIsOrderHistory(false)
+           }} className={` inline-flex items-center ${IsORderOpen? " bg-black bg-opacity-45":"text-gray-400"} px-3 py-1 rounded cursor-pointer `}>
               <RiBarChartGroupedLine className=" me-1"/> MY OPEN ORDERS
            </div>
-           <div className=" inline-flex items-center mx-auto px-3 text-gray-400 py-1 rounded" >
+           <div onClick={()=>{setIsOrderOpen(false);
+            SetIsOrderHistory(true)
+           }} className={`inline-flex items-center mx-auto px-3  ${IsOrderHistory? " bg-black bg-opacity-45":"text-gray-400"} py-1 cursor-pointer rounded`} >
               <BiCheckboxSquare className=" me-[2px] text-[1.6rem] opacity-90"/> MY ORDER HISTORY
-           </div>
-           <div>
-
            </div>
          </div>
          <div className=" flex-1 w-full flex items-center justify-center ">

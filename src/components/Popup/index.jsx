@@ -32,7 +32,7 @@ const DeactivateModal = ({ show, onClose }) => {
                 onClick={onClose}
                 className="mt-3 inline-flex  justify-center rounded-md py-[13px] bg-[#292c35] px-3  text-sm font-semibold  text-gray-400 shadow-sm hover:bg-opacity-70 sm:mt-0 w-[47%]"
               >
-                Not Know
+                Not Now
               </button>
               <button
                 type="button"

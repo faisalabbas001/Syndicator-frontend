@@ -1,15 +1,28 @@
-import  { useState } from "react";
+/* eslint-disable react/prop-types */
+
 import { GoArrowRight } from "react-icons/go";
 
 import "../styles/otcCard.css";
-const OTCcard = () => {
-  const [progressPercentage, setprogressPercentage] = useState(70);
+import { Link } from "react-router-dom";
+const OTCcard = ({data}) => {
+  const {contractAddress,
+    forAmount,
+    // forTokenImage,
+    forTotalValue,
+    name,
+    pricePerToken,
+    progressPercentage,
+    partialFull,
+    sellingAmount,
+    timeAgo,
+    // tokenImage
+    } = data;
   return (
-    <div className="max-w-md   overflow-hidden  rounded-lg shadow bg-custom-color">
-      <div className="grid grid-rows-3 ">
-        <div className="flex px-6 pt-6 pb-1 justify-between items-center">
+    <div className=" w-auto overflow-hidden  rounded-lg shadow bg-opacity-20 bg-[#333232]">
+      <div className="grid ">
+        <div className="flex px-3 xxl:px-4 pt-3 pb-1 justify-between items-center">
           <div className="flex items-center">
-            <div className="md:w-16 md:h-16  w-16 h-15 overflow-hidden rounded-full">
+            <div className="md:w-16 md:h-15 w-16 h-15 overflow-hidden rounded-full">
               <img
                 src="/assets/images/bong.jpeg"
                 alt="token-img"
@@ -17,13 +30,15 @@ const OTCcard = () => {
               />
             </div>
             <div className="ps-3">
-              <h3 className="text-white text-2xl">Bonk</h3>
+              <h3 className="text-white text-2xl">{name}</h3>
+              <div className=" flex flex-wrap gap-1 sm:gap-0">
               <span className="text-gray-500 text-xs rounded-md p-1 custon-gray-bg">
-                CA: DezX...B@63
+                {contractAddress}
               </span>
               <span className="text-gray-500 text-xs ms-1 rounded-md p-1 custon-gray-bg">
-                PARTIAL FULL
+                {partialFull}
               </span>
+              </div>
             </div>
           </div>
 
@@ -35,8 +50,8 @@ const OTCcard = () => {
             20%
           </div> */}
 
-          <div className="relative w-16 h-16 bg-custom-color">
-            <svg className="w-full h-full bg-custom-color" viewBox="0 0 100 100">
+          <div className="relative w-16 h-16 ">
+            <svg className="w-full h-full " viewBox="0 0 100 100">
               <circle
                 className=" custon-text stroke-current"
                 strokeWidth="9"
@@ -46,7 +61,7 @@ const OTCcard = () => {
                 fill="transparent"
               ></circle>
               <circle
-                className="text-green-400 bg-custom-color  progress-ring__circle stroke-current "
+                className="text-green-400   progress-ring__circle stroke-current "
                 strokeWidth="9"
                 strokeLinecap="round"
                 cx="50"
@@ -73,13 +88,13 @@ const OTCcard = () => {
           {/* <div><RadialProgressBar  progress={100}/></div> */}
         </div>
         {/* second row */}
-        <div className="flex  justify-between items-center">
+        <div className="flex  justify-between items-center py-1">
           <span>
             {" "}
-            <div className="flex flex-col px-6">
+            <div className="flex flex-col px-5">
               <span className=" custom-gray font-bold text-sm ">SELLING</span>
               <div className="flex items-center mt-1">
-                <span className="text-xl me-2 text-gray-300">8,000 </span>{" "}
+                <span className="text-xl me-2 text-gray-300">{sellingAmount}</span>{" "}
                 <div className="w-5 h-5 overflow-hidden rounded-full">
                   <img
                     src="/assets/images/bong.jpeg"
@@ -88,7 +103,7 @@ const OTCcard = () => {
                   />
                 </div>
               </div>
-              <span className=" custom-gray">$0.555/Token</span>
+              <span className=" custom-gray">${pricePerToken}/Token</span>
             </div>
           </span>
           <span>
@@ -102,7 +117,7 @@ const OTCcard = () => {
                 FOR
               </span>
               <div className="flex items-center mt-1">
-                <span className="text-xl me-2 text-indigo-600">63.2298</span>{" "}
+                <span className="text-xl me-2 text-indigo-600">{forTotalValue}</span>{" "}
                 <div className="w-5 h-5 overflow-hidden rounded-full">
                   <img
                     src="/assets/images/Solana_logo.png"
@@ -111,18 +126,18 @@ const OTCcard = () => {
                   />
                 </div>
               </div>
-              <span className=" custom-gray text-right">$4,440</span>
+              <span className=" custom-gray text-right">${forAmount}</span>
             </div>
           </span>
         </div>
 
-        <div className="border-t border-gray-800 flex justify-between items-center px-6 py-0 my-0 max-h-">
-          <span className=" custom-gray ">8m ago</span>
+        <div className="border-t border-gray-800 flex justify-between items-center px-6 my-0 py-2 ">
+          <span className=" custom-gray ">{timeAgo}</span>
           <span className="">
-            <button className="custon-gray-bg custom-gray font-bold py-3 px-4 rounded-xl flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
+            <Link to={`token-sale/${name}`} state={data} className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
               <span>Buy</span>
-              <GoArrowRight class="ml-2" size={20} />
-            </button>
+              <GoArrowRight className="ml-2" size={20} />
+            </Link>
           </span>
         </div>
       </div>
