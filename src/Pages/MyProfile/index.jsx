@@ -5,6 +5,37 @@ import { FaEthereum } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa";
 import "../../App.css"
 import { useState } from "react";
+import OTCcard from "../../components/otcCard";
+
+const OrdersData = [
+  {
+    "name": "Bonk",
+    "tokenImage": "/bong.jpeg",
+    "contractAddress": "DezX...B@63",
+    "partialFull": "PARTIAL FULL",
+    "progressPercentage": 82,
+    "sellingAmount": 8000,
+    "pricePerToken": 0.555,
+    "forAmount": 63.2298,
+    "forTokenImage": "/Solana_logo.png",
+    "forTotalValue": 4440,
+    "timeAgo": "8m ago"
+  },
+  {
+    "name": "Solana",
+    "tokenImage": "/Solana_logo.png",
+    "contractAddress": "SoLa...8G@28",
+    "partialFull": "PARTIAL FULL",
+    "progressPercentage": 90,
+    "sellingAmount": 15000,
+    "pricePerToken": 25.3,
+    "forAmount": 380000,
+    "forTokenImage": "/Ethereum_logo.png",
+    "forTotalValue": 10000000,
+    "timeAgo": "15m ago"
+  }
+]
+
 const MyProfile = () => {
    const [IsORderOpen, setIsOrderOpen] = useState(true);
    const [IsOrderHistory,SetIsOrderHistory]= useState(false)
@@ -95,13 +126,27 @@ const MyProfile = () => {
               <BiCheckboxSquare className=" me-[2px] text-[1.6rem] opacity-90"/> MY ORDER HISTORY
            </div>
          </div>
-         <div className=" flex-1 w-full flex items-center justify-center ">
-               <div className=" w-fit">
-                <p className=" text-[3rem] filter opacity-25 text-center">🤔</p>
-                <p className=" text-[1.4rem]">No Items Found</p>
-                <p className=" text-center text-gray-500">Nothing is here</p>
-               </div>
-         </div>
+         {
+          IsORderOpen && 
+          <div className="md:py-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-3 text-white">
+          {OrdersData.map((val, ind) => (
+            <div key={ind} className="py-1 md:py-0">
+              <OTCcard key={ind} data={val} />{" "}
+            </div>
+          ))}
+
+          {/* <div>04</div> */}
+        </div>
+         }
+        {
+          IsOrderHistory &&  <div className=" flex-1 w-full flex items-center justify-center ">
+          <div className=" w-fit">
+           <p className=" text-[3rem] filter opacity-25 text-center">🤔</p>
+           <p className=" text-[1.4rem]">No Items Found</p>
+           <p className=" text-center text-gray-500">Nothing is here</p>
+          </div>
+    </div>
+        }
         </div>
       </div>
     </>

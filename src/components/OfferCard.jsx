@@ -502,7 +502,7 @@ const Card2 = () => {
 </div>
 
 
-       <span className=" absolute rounded-full p-[6px] shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[32.3%] "><AiOutlineArrowDown className=""/></span>
+       <span className=" absolute rounded-full p-[6px] shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[33.5%] "><AiOutlineArrowDown className=""/></span>
 
       {/* For */}
 
