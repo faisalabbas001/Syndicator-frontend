@@ -31,11 +31,11 @@ const Layout = () => {
         <div className=" h-full w-full border-b-[1px] border-[#79797c] bg-[#000000] ">
           <div className=" ps-5 pe-2 sm:px-5 h-full w-full flex items-center justify-between">
             <div>
-                   <img  src="/logo.png" alt="logo" />
+                   <img height={180} width={180} src="/SyndicatorLogoPackage/FullLogo/Logo.png" alt="logo" />
             </div>
 
             <div>
-                <button className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-75 sm:scale-100  border border-white border-opacity-50 rounded-md">Connect Wallet</button>
+                <button className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md">Connect Wallet</button>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@ const Layout = () => {
           data-drawer-toggle="default-sidebar"
           aria-controls="default-sidebar"
           type="button"
-          className=" z-50 fixed left-0 top-2 items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden  dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          className=" z-50 fixed left-0 top-2 items-center pb-3 p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg md:hidden  dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
         >
           <svg
             className="w-6 h-6"
