@@ -41,7 +41,7 @@ const Layout = () => {
             <div>
                 {
                   userAddress ? <button
-                  className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md"
+                  className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-2 sm:px-4 py-[6px] transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md"
                   onClick={() => open()}
                 >
                   {userAddress.slice(0, 4) +
