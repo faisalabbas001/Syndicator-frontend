@@ -19,8 +19,8 @@ export default function App() {
           <Route path="token-sale/:id" element={<TokenSale/>}/>
           <Route path="/createoffers" element={<CreateOffers />} />
           <Route path="/myprofile" element={<MyProfile />} />
-          <Route path="*" element={<NoPage />} />
         </Route>
+        <Route path="*" element={<NoPage />} />
       </Routes>
       </Suspense>
     </BrowserRouter>
