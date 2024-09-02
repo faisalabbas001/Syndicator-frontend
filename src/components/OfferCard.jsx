@@ -421,8 +421,12 @@ const Card2 = () => {
 
   // Array of chain options
   const chainOptions = [
-    { name: "Solana", icon: "/assets/images/Solana_logo.png" },
-    { name: "Ethereum", icon: "/assets/images/Ethereum_logo.png" },
+    { name: "PEPE", icon: "/tokenImages/token1.png", address: "0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931" },
+    { name: "SyndicatorLabs", icon: "/tokenImages/token2.png",address: "0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb" },
+    { name: "Bitcoin", icon: "/tokenImages/token3.png",address: "0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7" },
+    { name: "Doge", icon: "/tokenImages/token4.png",address: "0x9bc8388dD439fa3365B1F78A81242aDBB4677759" },
+    { name: "FI", icon: "/tokenImages/token5.png",address: "0xe6714a67cabd598882C42e2719908E648E734ec3" },
+
   ];
   return (
     <div className=" 
@@ -477,7 +481,7 @@ const Card2 = () => {
         <FiChevronDown color="#94a3b8" />
       </button>
       {isDropdownOpen && (
-        <div className="absolute z-10 mt-2 w-full sm:w-48 custon-gray-bg rounded-md shadow-lg">
+        <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
           <ul className="py-1">
             {chainOptions.map((chain, index) => (
               <li key={index}>
@@ -545,43 +549,16 @@ const Card2 = () => {
         className="flex items-center justify-between w-full sm:w-auto space-x-1 text-white focus:outline-none rounded-md border border-gray-600 bg-opacity-80 p-1 sm:mt-0"
         onClick={toggleDropdown1}
       >
-        {selectedChain1.icon ? (
-          <img
-            src={selectedChain1.icon}
-            alt={selectedChain1.name || "Ethereum"}
-            className="w-6 h-6 mr-1"
-          />
-        ) : (
+        
           <img
             src="/assets/images/Ethereum_logo.png"
             alt="Ethereum"
             className="w-6 h-6 mr-1"
           />
-        )}
-        <span className="text-sm">{selectedChain1.name || "Ethereum"}</span>
-        <FiChevronDown color="#94a3b8" />
+        
+        <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
       </button>
-      {isDropdownOpen1 && (
-        <div className="absolute z-10 mt-2 w-full sm:w-48 custon-gray-bg rounded-md shadow-lg">
-          <ul className="py-1">
-            {chainOptions.map((chain, index) => (
-              <li key={index}>
-                <button
-                  className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                  onClick={() => handleChainSelect1(chain)}
-                >
-                  <img
-                    src={chain.icon}
-                    alt={chain.name}
-                    className="w-6 h-6 mr-2"
-                  />
-                  {chain.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      
     </div>
   </div>
 </div>

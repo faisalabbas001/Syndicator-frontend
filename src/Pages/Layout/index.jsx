@@ -7,12 +7,16 @@ import { BsFillEyeFill } from "react-icons/bs";
 import { AiOutlineDown } from "react-icons/ai"; 
 import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 const Layout = () => {
 
     const [isOpen, setIsOpen] = useState(true);
     const [isOpen2, setIsOpen2] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { address: userAddress } = useAccount();
+    const { open } = useWeb3Modal();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -35,7 +39,19 @@ const Layout = () => {
             </div>
 
             <div>
-                <button className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md">Connect Wallet</button>
+                {
+                  userAddress ? <button
+                  className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md"
+                  onClick={() => open()}
+                >
+                  {userAddress.slice(0, 4) +
+                    "..." +
+                    userAddress.slice(-4)}
+                </button>:
+                <button onClick={()=>open()} className=" text-white text-[14px] sm:text-[16px] bg-[#363a41] px-1 sm:px-3 py-1 transform scale-90 sm:scale-100  border border-white border-opacity-50 rounded-md">Connect Wallet</button>
+
+                }
+               
             </div>
           </div>
         </div>
