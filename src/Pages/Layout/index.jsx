@@ -34,9 +34,9 @@ const Layout = () => {
       <header className=" fixed top-0 h-20 w-full z-10">
         <div className=" h-full w-full border-b-[1px] border-[#79797c] bg-[#000000] ">
           <div className=" ps-5 pe-2 sm:px-5 h-full w-full flex items-center justify-between">
-            <div>
+            <Link to={"/"}>
                    <img height={180} width={180} src="/SyndicatorLogoPackage/FullLogo/Logo.png" alt="logo" />
-            </div>
+            </Link>
 
             <div>
                 {
