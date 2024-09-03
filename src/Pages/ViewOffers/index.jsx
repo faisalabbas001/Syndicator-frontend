@@ -29,12 +29,15 @@ const Home = () => {
         <div className="md:py-3 px-2  md:px-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-3 text-white">
           {TokenData.map((val, ind) => (
             <div key={ind} className="py-1 md:py-0">
-              <OTCcard key={ind} data={val} />{" "}
+              <OTCcard key={ind} data={val} />
             </div>
           ))}
 
           {/* <div>04</div> */}
         </div>
+     
+
+
       )}
     </>
   );

@@ -18,11 +18,12 @@ const OTCcard = ({data}) => {
     // tokenImage
     } = data;
   return (
-    <div className=" w-auto overflow-hidden  rounded-lg shadow bg-opacity-20 bg-[#333232]">
-      <div className="grid ">
+    // <div className=" w-auto h-auto overflow-hidden  rounded-lg shadow bg-opacity-20 bg-[#333232]">
+    <div className="w-auto overflow-hidden rounded-lg shadow bg-opacity-20 bg-[#333232] flex flex-col h-full">
+      {/* <div className="grid "> */}
         <div className="flex px-3 xxl:px-4 pt-3 pb-1 justify-between items-center">
           <div className="flex items-center">
-            <div className="md:w-16 md:h-15 w-16 h-15 overflow-hidden rounded-full">
+            <div className="md:w-16 md:h-auto w-16 h-auto overflow-hidden rounded-full">
               <img
                 src="/assets/images/bong.jpeg"
                 alt="token-img"
@@ -31,11 +32,11 @@ const OTCcard = ({data}) => {
             </div>
             <div className="ps-3">
               <h3 className="text-white text-2xl">{name}</h3>
-              <div className=" flex flex-wrap gap-1 sm:gap-0">
+              <div className=" flex flex-wrap gap-x-1 sm:gap-y-1">
               <span className="text-gray-500 text-xs rounded-md p-1 custon-gray-bg">
                 {contractAddress}
               </span>
-              <span className="text-gray-500 text-xs ms-1 rounded-md p-1 custon-gray-bg">
+              <span className="text-gray-500 text-xs  rounded-md p-1 custon-gray-bg">
                 {partialFull}
               </span>
               </div>
@@ -50,7 +51,7 @@ const OTCcard = ({data}) => {
             20%
           </div> */}
 
-          <div className="relative w-16 h-16 ">
+          <div className="relative w-16 h-auto ">
             <svg className="w-full h-full " viewBox="0 0 100 100">
               <circle
                 className=" custon-text stroke-current"
@@ -95,7 +96,7 @@ const OTCcard = ({data}) => {
               <span className=" custom-gray font-bold text-sm ">SELLING</span>
               <div className="flex items-center mt-1">
                 <span className="text-xl me-2 text-gray-300">{sellingAmount}</span>{" "}
-                <div className="w-5 h-5 overflow-hidden rounded-full">
+                <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img
                     src="/assets/images/bong.jpeg"
                     alt="token-img"
@@ -118,7 +119,7 @@ const OTCcard = ({data}) => {
               </span>
               <div className="flex items-center mt-1">
                 <span className="text-xl me-2 text-indigo-600">{forTotalValue}</span>{" "}
-                <div className="w-5 h-5 overflow-hidden rounded-full">
+                <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img
                     src="/assets/images/Solana_logo.png"
                     alt="token-img"
@@ -141,7 +142,7 @@ const OTCcard = ({data}) => {
           </span>
         </div>
       </div>
-    </div>
+    // </div>
   );
 };
 
