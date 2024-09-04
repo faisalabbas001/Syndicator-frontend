@@ -577,6 +577,7 @@ const Card2 = () => {
     },
   ];
 
+<<<<<<< HEAD
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());
   equivalent_asset = [
@@ -584,6 +585,15 @@ const Card2 = () => {
     selectedChain1.address
   ];
   // console.log(equivalent_asset)
+=======
+  const chunk_num = 1;
+  // eslint-disable-next-line no-unused-vars
+  const equivalent_asset = {
+    chunk_size: ForAmount / chunk_num,
+    asset_address: selectedChain1.address
+};
+// console.log(equivalent_asset)
+>>>>>>> 13f7db20504e20f1e1fe039b30a8ea46a875bba4
   return (
     <div
       className=" 
