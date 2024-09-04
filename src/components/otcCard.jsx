@@ -1,20 +1,24 @@
 /* eslint-disable react/prop-types */
 
 import { GoArrowRight } from "react-icons/go";
+import{ethers}from 'ethers';
 
 import "../styles/otcCard.css";
 import { Link } from "react-router-dom";
+import { decimal, formater } from "../BlockChainContext/helper";
 const OTCcard = ({data}) => {
-  const {contractAddress,
-    forAmount,
+  console.log(data)
+  const {owned_asset:contractAddress,
+    owner,
+    requested_assets:forAmount,
     // forTokenImage,
     forTotalValue,
     name,
     pricePerToken,
     progressPercentage,
     partialFull,
-    sellingAmount,
-    timeAgo,
+    amount:sellingAmount,
+    // timeAgo,
     // tokenImage
     } = data;
   return (
@@ -34,7 +38,7 @@ const OTCcard = ({data}) => {
               <h3 className="text-white text-2xl">{name}</h3>
               <div className=" flex flex-wrap gap-x-1 sm:gap-y-1">
               <span className="text-gray-500 text-xs rounded-md p-1 custon-gray-bg">
-                {contractAddress}
+                {contractAddress.asset_address}
               </span>
               <span className="text-gray-500 text-xs  rounded-md p-1 custon-gray-bg">
                 {partialFull}
@@ -95,7 +99,7 @@ const OTCcard = ({data}) => {
             <div className="flex flex-col px-5">
               <span className=" custom-gray font-bold text-sm ">SELLING</span>
               <div className="flex items-center mt-1">
-                <span className="text-xl me-2 text-gray-300">{sellingAmount}</span>{" "}
+                <span className="text-xl me-2 text-gray-300">{formater(sellingAmount)}</span>{" "}
                 <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img
                     src="/assets/images/bong.jpeg"
@@ -118,7 +122,7 @@ const OTCcard = ({data}) => {
                 FOR
               </span>
               <div className="flex items-center mt-1">
-                <span className="text-xl me-2 text-indigo-600">{forTotalValue}</span>{" "}
+                <span className="text-xl me-2 text-indigo-600">{formater(forAmount[0].chunk_size)}</span>{" "}
                 <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img
                     src="/assets/images/Solana_logo.png"
@@ -127,13 +131,13 @@ const OTCcard = ({data}) => {
                   />
                 </div>
               </div>
-              <span className=" custom-gray text-right">${forAmount}</span>
+              <span className=" custom-gray text-right">$500</span>
             </div>
           </span>
         </div>
 
         <div className="border-t border-gray-800 flex justify-between items-center px-6 my-0 py-2 ">
-          <span className=" custom-gray ">{timeAgo}</span>
+          <span className=" custom-gray ">8m ago</span>
           <span className="">
             <Link to={`token-sale/${name}`} state={data} className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
               <span>Buy</span>
