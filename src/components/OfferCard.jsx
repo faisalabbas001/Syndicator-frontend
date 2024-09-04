@@ -403,6 +403,8 @@ const Card2 = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Partial Fill");
+  const [offerAmount,SetOfferAmount] = useState()
+  const [ForAmount,SetForAmount] = useState()
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -411,23 +413,38 @@ const Card2 = () => {
   };
 
   const handleChainSelect = (chain) => {
+    if(chain.name===selectedChain1?.name){
+      alert("Please choose another")
+      return;
+    }
     setSelectedChain(chain);
     setIsDropdownOpen(false);
   };
   const handleChainSelect1 = (chain) => {
+    if(chain.name===selectedChain?.name){
+      alert("Please choose another")
+      return;
+    }
     setSelectedChain1(chain);
     setIsDropdownOpen1(false);
   };
 
   // Array of chain options
   const chainOptions = [
+    { name: "ETH", icon: "/assets/images/Ethereum_logo.png", address: "0x0000000000000000000000000000000000000000" },
     { name: "PEPE", icon: "/tokenImages/token1.png", address: "0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931" },
     { name: "SyndicatorLabs", icon: "/tokenImages/token2.png",address: "0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb" },
     { name: "Bitcoin", icon: "/tokenImages/token3.png",address: "0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7" },
     { name: "Doge", icon: "/tokenImages/token4.png",address: "0x9bc8388dD439fa3365B1F78A81242aDBB4677759" },
     { name: "FI", icon: "/tokenImages/token5.png",address: "0xe6714a67cabd598882C42e2719908E648E734ec3" },
-
   ];
+
+  const chunk_num = 1;
+  const equivalent_asset = {
+    chunk_size: ForAmount / chunk_num,
+    asset_address: selectedChain1.address
+};
+// console.log(equivalent_asset)
   return (
     <div className=" 
      md:p-3 rounded-lg mt-2 flex flex-col w-full md:w-screen max-w-lg relative ">
@@ -456,8 +473,10 @@ const Card2 = () => {
       </div>
     </div>
     <input
-      type="text"
+      type="number"
       inputMode="numeric"
+      value={offerAmount}
+      onChange={(e)=>SetOfferAmount(e.target.value)}
       placeholder="Enter amount to offer"
       className=" bg-transparent px-2 py-1 mt-2 w-full sm:w-auto outline-none border-none text-white text-xl"
     />
@@ -534,7 +553,9 @@ const Card2 = () => {
       </div>
     </div>
     <input
-      type="text"
+      type="number"
+      value={ForAmount}
+      onChange={(e)=>SetForAmount(e.target.value)}
       inputMode="numeric"
       placeholder="0.00"
       className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
@@ -542,10 +563,10 @@ const Card2 = () => {
   </div>
   <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
     <div className="relative w-full sm:w-auto">
-      <span className="text-[11px] text-gray-500 absolute right-2 -top-4">
+      <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
         Balance <strong className={"text-white"}>0 ETH</strong>
       </span>
-      <button
+      {/* <button
         className="flex items-center justify-between w-full sm:w-auto space-x-1 text-white focus:outline-none rounded-md border border-gray-600 bg-opacity-80 p-1 sm:mt-0"
         onClick={toggleDropdown1}
       >
@@ -557,8 +578,44 @@ const Card2 = () => {
           />
         
         <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
+      </button> */}
+       <button
+        className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
+        onClick={toggleDropdown1}
+      >
+        {selectedChain1.icon ? (
+          <img
+            src={selectedChain1.icon}
+            alt={selectedChain1.name || "Solana"}
+            className="w-4 h-4 mr-1"
+          />
+        ) : (
+          "Select Token"
+        )}
+        <span className="text-sm">{selectedChain1.name || ""}</span>
+        <FiChevronDown color="#94a3b8" />
       </button>
-      
+      {isDropdownOpen1 && (
+        <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
+          <ul className="py-1">
+            {chainOptions.map((chain, index) => (
+              <li key={index}>
+                <button
+                  className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
+                  onClick={() => handleChainSelect1(chain)}
+                >
+                  <img
+                    src={chain.icon}
+                    alt={chain.name}
+                    className="w-6 h-6 mr-2"
+                  />
+                  {chain.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   </div>
 </div>
