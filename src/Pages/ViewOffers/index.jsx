@@ -13,6 +13,8 @@ const Home = () => {
     setLoading(false);
   };
 
+  
+
   useEffect(() => {
     FetchData();
   }, []);

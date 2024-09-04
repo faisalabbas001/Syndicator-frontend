@@ -440,6 +440,7 @@ const Card2 = () => {
   ];
 
   const chunk_num = 1;
+  // eslint-disable-next-line no-unused-vars
   const equivalent_asset = {
     chunk_size: ForAmount / chunk_num,
     asset_address: selectedChain1.address
