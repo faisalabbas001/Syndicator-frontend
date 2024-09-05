@@ -35,7 +35,6 @@ const [data,setdata] = useState([]);
     }
   };
 
-<<<<<<< HEAD
 
   const getOffers=async()=>{
     try {
@@ -59,9 +58,6 @@ const [data,setdata] = useState([]);
       
     }
   }
-=======
-  
->>>>>>> 13f7db20504e20f1e1fe039b30a8ea46a875bba4
 
   useEffect(() => {
     getOffers();

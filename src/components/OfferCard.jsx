@@ -40,7 +40,6 @@ const OfferMarketCard = () => {
   //   const [selected, setSelected] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showModal, setShowModal] = useState(false);
-
   const handleNext = () => {
     if (activeStep < totalSteps) {
       setActiveStep(activeStep + 1);
@@ -518,6 +517,8 @@ const Card2 = () => {
   const [selectedOption, setSelectedOption] = useState('Partial Fill');
   const [offerAmount, SetOfferAmount] = useState();
   const [ForAmount, SetForAmount] = useState(0);
+  const [addmultitoken, setmultitoken] = useState(0);
+
   OfferAmount1 = offerAmount;
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -577,7 +578,6 @@ const Card2 = () => {
     },
   ];
 
-<<<<<<< HEAD
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());
   equivalent_asset = [
@@ -585,15 +585,18 @@ const Card2 = () => {
     selectedChain1.address
   ];
   // console.log(equivalent_asset)
-=======
-  const chunk_num = 1;
-  // eslint-disable-next-line no-unused-vars
-  const equivalent_asset = {
-    chunk_size: ForAmount / chunk_num,
-    asset_address: selectedChain1.address
-};
-// console.log(equivalent_asset)
->>>>>>> 13f7db20504e20f1e1fe039b30a8ea46a875bba4
+
+  
+
+  const HandleMultiCoin=()=>{
+    if(!selectedChain1 && ForAmount == 0){
+      console.log("add amount ")
+      
+    }
+    else{
+      setmultitoken((val)=>val+1)
+    }
+  }
   return (
     <div
       className=" 
@@ -686,11 +689,13 @@ const Card2 = () => {
         </div>
       </div>
 
-      <span className=" absolute rounded-full p-[6px] shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[33.5%] ">
+      <span className=" absolute rounded-full p-[6px] shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[157px] ">
         <AiOutlineArrowDown className="" />
       </span>
 
       {/* For */}
+
+     
 
       <div
         style={{
@@ -748,6 +753,7 @@ const Card2 = () => {
         
         <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
       </button> */}
+            <div className=' flex items-center gap-x-1'>
             <button
               className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
               onClick={toggleDropdown1}
@@ -763,7 +769,12 @@ const Card2 = () => {
               )}
               <span className="text-sm">{selectedChain1.name || ''}</span>
               <FiChevronDown color="#94a3b8" />
+              
             </button>
+            <span onClick={HandleMultiCoin} className='cursor-pointer rounded-[50%] bg-[#fec949] h-5 p-1 w-6 me-1 flex justify-center text-black items-center'>+</span>
+            </div>
+      
+
             {isDropdownOpen1 && (
               <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
                 <ul className="py-1">
@@ -788,6 +799,113 @@ const Card2 = () => {
           </div>
         </div>
       </div>
+
+      {
+       Array(addmultitoken).fill().map((_,index)=>(
+          <div
+        style={{
+          boxShadow:
+            '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
+        }}
+        className="flex flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px] mb-2"
+      >
+        <div className="flex items-start flex-col w-full sm:w-auto">
+          <div className="flex items-center w-full">
+            <span
+              className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
+              style={{ fontSize: '70%' }}
+            >
+              FOR
+            </span>
+            <div className="relative">
+              <CiCircleInfo
+                color="white"
+                size={12}
+                onMouseEnter={() => setShowInfo1(true)}
+                onMouseLeave={() => setShowInfo1(false)}
+              />
+              {showInfo1 && (
+                <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
+                  The Amount you are paying
+                </div>
+              )}
+            </div>
+          </div>
+          <input
+            type="number"
+            value={ForAmount}
+            onChange={(e) => SetForAmount(e.target.value)}
+            inputMode="numeric"
+            placeholder="0.00"
+            className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
+          />
+        </div>
+        <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="relative w-full sm:w-auto">
+            <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
+              Balance <strong className={'text-white'}>0 ETH</strong>
+            </span>
+            {/* <button
+        className="flex items-center justify-between w-full sm:w-auto space-x-1 text-white focus:outline-none rounded-md border border-gray-600 bg-opacity-80 p-1 sm:mt-0"
+        onClick={toggleDropdown1}
+      >
+        
+          <img
+            src="/assets/images/Ethereum_logo.png"
+            alt="Ethereum"
+            className="w-6 h-6 mr-1"
+          />
+        
+        <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
+      </button> */}
+            <div className=' flex items-center gap-x-1'>
+            <button
+              className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
+              onClick={toggleDropdown1}
+            >
+              {selectedChain1.icon ? (
+                <img
+                  src={selectedChain1.icon}
+                  alt={selectedChain1.name || 'Solana'}
+                  className="w-4 h-4 mr-1"
+                />
+              ) : (
+                'Select Token'
+              )}
+              <span className="text-sm">{selectedChain1.name || ''}</span>
+              <FiChevronDown color="#94a3b8" />
+              
+            </button>
+            <span onClick={HandleMultiCoin} className='cursor-pointer rounded-[50%] bg-[#fec949] h-5 p-1 w-6 me-1 flex justify-center text-black items-center'>+</span>
+            </div>
+      
+
+            {isDropdownOpen1 && (
+              <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
+                <ul className="py-1">
+                  {chainOptions.map((chain, index) => (
+                    <li key={index}>
+                      <button
+                        className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
+                        onClick={() => handleChainSelect1(chain)}
+                      >
+                        <img
+                          src={chain.icon}
+                          alt={chain.name}
+                          className="w-6 h-6 mr-2"
+                        />
+                        {chain.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+       ))
+      }
 
       <div className="flex flex-col items-start p-2 mt-2">
         <h1 className="text-gray-500 font-bold text-[13px]">FILL TYPE</h1>
