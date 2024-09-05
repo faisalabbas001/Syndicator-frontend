@@ -515,10 +515,14 @@ const Card2 = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Partial Fill');
+  const [todoAddAddress,setTodoAddAddress] = useState('');
+  const [todoAddressData,setTodoAdressData] = useState([]);
   const [offerAmount, SetOfferAmount] = useState();
   const [ForAmount, SetForAmount] = useState(0);
-  const [addmultitoken, setmultitoken] = useState(0);
+  const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(10);
 
+const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropdownOpen: false }]);
+  const [selectedOfferToken, setSelectedOfferToken] = useState(null);
   OfferAmount1 = offerAmount;
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -584,19 +588,63 @@ const Card2 = () => {
     ethers.utils.parseUnits(ForAmount.toString(),"ether"),
     selectedChain1.address
   ];
-  // console.log(equivalent_asset)
 
+  const toggleDropdownAddedBox = (index) => {
+    setForAmounts((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, isDropdownOpen: !item.isDropdownOpen } : item))
+    );
+  };
   
+  // Handle token select for a specific index
+  const handleTokenSelect = (index, token) => {
+    // Prevent selecting the same token for multiple forAmount boxes
+    if (forAmounts.some((item) => item.token?.name === token.name)) {
+      alert('This token has already been selected in another box. Please choose a different token.');
+      return;
+    }
+  
+    setForAmounts((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, token, isDropdownOpen: false } : item))
+    );
+  };
+  
+  // Handle forAmount input change for a specific index
+  const handleForAmountChange = (index, amount) => {
+    setForAmounts((prev) => prev.map((item, i) => (i === index ? { ...item, amount } : item)));
+  };
+  
+  // Add a new forAmount field
+  const addForAmount = () => {
+    const allValid = forAmounts.every(item => item.amount && item.token);
+    
+    if (!allValid) {
+      alert("Please fill out all previous boxes before adding a new one.");
+      return;
+    }
+  
+    if (forAmounts.length >= 6) {
+      alert("Limit exceeded");
+      return;
+    }
+  
+    setForAmounts((prev) => [...prev, { amount: '', token: null, isDropdownOpen: false }]);
+  };
 
   const HandleMultiCoin=()=>{
     if(!selectedChain1 && ForAmount == 0){
-      console.log("add amount ")
-      
+      alert("Must select the token")
     }
     else{
       setmultitoken((val)=>val+1)
     }
   }
+
+  const AddTodoAddressFunction = ()=>{
+    setTodoAdressData((prev)=>[...prev,todoAddAddress])
+    setTodoAddAddress("")
+  }
+
+  // console.log(forAmounts)
   return (
     <div
       className=" 
@@ -696,216 +744,113 @@ const Card2 = () => {
       {/* For */}
 
      
-
-      <div
-        style={{
-          boxShadow:
-            '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
-        }}
-        className="flex flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px] mb-2"
-      >
-        <div className="flex items-start flex-col w-full sm:w-auto">
-          <div className="flex items-center w-full">
-            <span
-              className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
-              style={{ fontSize: '70%' }}
-            >
-              FOR
-            </span>
-            <div className="relative">
-              <CiCircleInfo
-                color="white"
-                size={12}
-                onMouseEnter={() => setShowInfo1(true)}
-                onMouseLeave={() => setShowInfo1(false)}
-              />
-              {showInfo1 && (
-                <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
-                  The Amount you are paying
-                </div>
-              )}
-            </div>
-          </div>
-          <input
-            type="number"
-            value={ForAmount}
-            onChange={(e) => SetForAmount(e.target.value)}
-            inputMode="numeric"
-            placeholder="0.00"
-            className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
-          />
-        </div>
-        <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
-          <div className="relative w-full sm:w-auto">
-            <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
-              Balance <strong className={'text-white'}>0 ETH</strong>
-            </span>
-            {/* <button
-        className="flex items-center justify-between w-full sm:w-auto space-x-1 text-white focus:outline-none rounded-md border border-gray-600 bg-opacity-80 p-1 sm:mt-0"
-        onClick={toggleDropdown1}
-      >
-        
-          <img
-            src="/assets/images/Ethereum_logo.png"
-            alt="Ethereum"
-            className="w-6 h-6 mr-1"
-          />
-        
-        <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
-      </button> */}
-            <div className=' flex items-center gap-x-1'>
-            <button
-              className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
-              onClick={toggleDropdown1}
-            >
-              {selectedChain1.icon ? (
-                <img
-                  src={selectedChain1.icon}
-                  alt={selectedChain1.name || 'Solana'}
-                  className="w-4 h-4 mr-1"
-                />
-              ) : (
-                'Select Token'
-              )}
-              <span className="text-sm">{selectedChain1.name || ''}</span>
-              <FiChevronDown color="#94a3b8" />
-              
-            </button>
-            <span onClick={HandleMultiCoin} className='cursor-pointer rounded-[50%] bg-[#fec949] h-5 p-1 w-6 me-1 flex justify-center text-black items-center'>+</span>
-            </div>
-      
-
-            {isDropdownOpen1 && (
-              <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
-                <ul className="py-1">
-                  {chainOptions.map((chain, index) => (
-                    <li key={index}>
-                      <button
-                        className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                        onClick={() => handleChainSelect1(chain)}
-                      >
-                        <img
-                          src={chain.icon}
-                          alt={chain.name}
-                          className="w-6 h-6 mr-2"
-                        />
-                        {chain.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+     <div id='forAmountScrollbar' className=' flex flex-col max-h-[244px] overflow-y-auto'>     
       {
-       Array(addmultitoken).fill().map((_,index)=>(
-          <div
-        style={{
-          boxShadow:
-            '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
-        }}
-        className="flex flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px] mb-2"
-      >
-        <div className="flex items-start flex-col w-full sm:w-auto">
-          <div className="flex items-center w-full">
-            <span
-              className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
-              style={{ fontSize: '70%' }}
-            >
-              FOR
-            </span>
-            <div className="relative">
-              <CiCircleInfo
-                color="white"
-                size={12}
-                onMouseEnter={() => setShowInfo1(true)}
-                onMouseLeave={() => setShowInfo1(false)}
-              />
-              {showInfo1 && (
-                <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
-                  The Amount you are paying
-                </div>
-              )}
-            </div>
+  forAmounts.map((forAmount, index) => (
+    <div
+      key={index}
+      style={{
+        boxShadow:
+          '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
+      }}
+      className="flex flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
+    >
+      <div className="flex items-start flex-col w-full sm:w-auto">
+        <div className="flex items-center w-full">
+          <span
+            className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
+            style={{ fontSize: '70%' }}
+          >
+            FOR
+          </span>
+          <div className="relative">
+            <CiCircleInfo
+              color="white"
+              size={12}
+              onMouseEnter={() => setShowInfo1(true)}
+              onMouseLeave={() => setShowInfo1(false)}
+            />
+            {showInfo1 && (
+              <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
+                The Amount you are paying
+              </div>
+            )}
           </div>
-          <input
-            type="number"
-            value={ForAmount}
-            onChange={(e) => SetForAmount(e.target.value)}
-            inputMode="numeric"
-            placeholder="0.00"
-            className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
-          />
         </div>
-        <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
-          <div className="relative w-full sm:w-auto">
-            <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
-              Balance <strong className={'text-white'}>0 ETH</strong>
-            </span>
-            {/* <button
-        className="flex items-center justify-between w-full sm:w-auto space-x-1 text-white focus:outline-none rounded-md border border-gray-600 bg-opacity-80 p-1 sm:mt-0"
-        onClick={toggleDropdown1}
-      >
-        
-          <img
-            src="/assets/images/Ethereum_logo.png"
-            alt="Ethereum"
-            className="w-6 h-6 mr-1"
-          />
-        
-        <span className="text-sm pe-2">{selectedChain1.name || "Ethereum"}</span>
-      </button> */}
-            <div className=' flex items-center gap-x-1'>
+        <input
+          type="number"
+          value={forAmount.amount}
+          onChange={(e) => handleForAmountChange(index, e.target.value)}
+          inputMode="numeric"
+          placeholder="0.00"
+          className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
+        />
+      </div>
+
+      <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
+        <div className=" w-full sm:w-auto">
+          <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
+            Balance <strong className="text-white">0 ETH</strong>
+          </span>
+          <div className="flex items-center gap-x-1">
             <button
               className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
-              onClick={toggleDropdown1}
+              onClick={() => toggleDropdownAddedBox(index)}
             >
-              {selectedChain1.icon ? (
+              {forAmount.token ? (
                 <img
-                  src={selectedChain1.icon}
-                  alt={selectedChain1.name || 'Solana'}
+                  src={forAmount.token.icon}
+                  alt={forAmount.token.name}
                   className="w-4 h-4 mr-1"
                 />
               ) : (
                 'Select Token'
               )}
-              <span className="text-sm">{selectedChain1.name || ''}</span>
+              <span className="text-sm">{forAmount.token?.name || ''}</span>
               <FiChevronDown color="#94a3b8" />
-              
             </button>
-            <span onClick={HandleMultiCoin} className='cursor-pointer rounded-[50%] bg-[#fec949] h-5 p-1 w-6 me-1 flex justify-center text-black items-center'>+</span>
-            </div>
-      
-
-            {isDropdownOpen1 && (
-              <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
-                <ul className="py-1">
-                  {chainOptions.map((chain, index) => (
-                    <li key={index}>
-                      <button
-                        className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                        onClick={() => handleChainSelect1(chain)}
-                      >
-                        <img
-                          src={chain.icon}
-                          alt={chain.name}
-                          className="w-6 h-6 mr-2"
-                        />
-                        {chain.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            
           </div>
+
+          {forAmount.isDropdownOpen && (
+            <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
+              <ul className="py-1">
+                {chainOptions.map((chain, idx) => (
+                  <li key={idx}>
+                    <button
+                      className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
+                      onClick={() => handleTokenSelect(index, chain)}
+                    >
+                      <img
+                        src={chain.icon}
+                        alt={chain.name}
+                        className="w-6 h-6 mr-2"
+                      />
+                      {chain.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
         </div>
+        
       </div>
-       ))
-      }
+      
+    </div>
+  ))
+}
+           <button disabled={forAmounts.length===7}
+              onClick={addForAmount}
+              className="cursor-pointer rounded-[5px] mt-2 font-semibold bg-[#fec949] w-[99%] py-1 mx-auto text-black "
+            >
+              Add More Token
+            </button>
+
+     </div>
+
+     
 
       <div className="flex flex-col items-start p-2 mt-2">
         <h1 className="text-gray-500 font-bold text-[13px]">FILL TYPE</h1>
@@ -921,10 +866,47 @@ const Card2 = () => {
           <span className="checkmark"></span>
           <span className="ms-7 text-white text-sm">Partial Fill</span>
         </div>
-        <p className="ms-7 text-sm text-gray-500">
+        <p className="ms-7 text-sm text-gray-500 w-[80%]">
           Multiple Users can contribute to fulfill their offer
-        </p>
+          {
+            selectedOption === "Partial Fill" && <div className="flex flex-col mt-6">
+            <div className="relative w-full h-[2px] bg-gray-300 rounded-full">
+              <div className="absolute top-0 left-0 h-full bg-[#00e641] rounded-full" style={{ width: `${PartialFillChunkSize-5}%` }}></div>
+              
+              {/* Circles */}
+              <div className="absolute -top-[7px] left-0 flex justify-between w-full">
+                <div onClick={()=>SetPartialFillChunkSize(10)} className={`w-4 h-4 ${PartialFillChunkSize >= 10? "bg-[#00e641]": " bg-slate-600 border-gray-400"}  cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(20)} className={`w-4 h-4 ${PartialFillChunkSize >=20? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer  rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(30)} className={`w-4 h-4 ${PartialFillChunkSize>=30? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(40)} className={`w-4 h-4 ${PartialFillChunkSize>=40? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(50)} className={`w-4 h-4 ${PartialFillChunkSize>=50? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                
+                <div onClick={()=>SetPartialFillChunkSize(60)} className={`w-4 h-4 ${PartialFillChunkSize>=60? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(70)} className={`w-4 h-4 ${PartialFillChunkSize>=70? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                
+                <div onClick={()=>SetPartialFillChunkSize(80)} className={`w-4 h-4 ${PartialFillChunkSize>=80? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(90)} className={`w-4 h-4 ${PartialFillChunkSize>=90? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
+                <div onClick={()=>SetPartialFillChunkSize(100)} className={`w-4 h-4 ${PartialFillChunkSize>=100? "bg-[#00e641]": " bg-slate-600 border-gray-400"} cursor-pointer rounded-full`}></div>
 
+              </div>
+            </div>
+            
+            <div className="flex justify-between mt-2 ms-1 text-gray-400">
+              <p className=" text-xs ">10%</p>
+              <p className=" text-xs">20%</p>
+              <p className=" text-xs">30%</p>
+              <p className=" text-xs">40%</p>
+              <p className=" text-xs">50%</p>
+              <p className=" text-xs">60%</p>
+              <p className=" text-xs">70%</p>
+              <p className=" text-xs">80%</p>
+              <p className=" text-xs">90%</p>
+              <p className=" text-xs">100%</p>
+            </div>
+          </div>
+          }
+        </p>
+          
         <div className="container">
           <input
             type="radio"
@@ -951,8 +933,40 @@ const Card2 = () => {
           <span className="checkmark"></span>
           <span className="ms-7 text-white text-sm">Private Fill</span>
         </div>
-        <p className="ms-7 text-sm text-gray-500">
+        <p className="ms-7 text-sm text-gray-500 w-[80%]">
           Offer can only be filled by whitelisted user
+         
+          {
+            selectedOption === 'Private Fill' && <div className='w-full mt-6 p-4 bg-[#15161B] rounded-lg shadow-md'>
+            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
+              <input
+                type="text"
+                name="text"
+                value={todoAddAddress}
+                onChange={(e) => setTodoAddAddress(e.target.value)}
+                className='w-full sm:w-2/3 p-2 border border-gray-700 bg-gray-800 text-white rounded-md outline-none'
+                placeholder='Enter your address...'
+              />
+              <button
+                onClick={AddTodoAddressFunction}
+                className='mt-2 sm:mt-0 w-full sm:w-auto py-2 px-2 bg-[#fec949] text-black font-semibold rounded-md hover:bg-[#fce042] transition duration-300'
+              >
+                Add Address
+              </button>
+            </div>
+            <div id='forAmountScrollbar' className='mt-4 max-h-[120px] overflow-y-auto'>
+              {
+                todoAddressData && todoAddressData.map((val, ind) => (
+                  <div key={ind} className='p-2 mb-2 bg-gray-800 text-white rounded-md shadow-md'>
+                    <p>{val}</p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          }
+
+
         </p>
       </div>
 
@@ -967,6 +981,11 @@ const Card2 = () => {
     </div>
   );
 };
+
+
+
+
+
 
 const Card3 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -5,9 +5,9 @@ import './index.css'
 import AppKitProvider from './BlockChainContext/wagmi.jsx'
 
 createRoot(document.getElementById('root')).render(
-  // <StrictMode>
+  <StrictMode>
     <AppKitProvider>
     <App />
     </AppKitProvider>
-  // </StrictMode>,
+   </StrictMode>,
 )
