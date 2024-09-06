@@ -609,14 +609,12 @@ const Card1 = () => {
 const Card2 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState('');
-  const [selectedChain1, setSelectedChain1] = useState('');
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Partial Fill');
   const [todoAddAddress,setTodoAddAddress] = useState('');
   const [todoAddressData,setTodoAdressData] = useState([]);
   const [offerAmount, SetOfferAmount] = useState(0);
-  const [ForAmount, SetForAmount] = useState(0);
   const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(2);
   const [tooltip, setTooltip] = useState(null);
 const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropdownOpen: false }]);
@@ -728,10 +726,16 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
     setForAmounts((prev) => [...prev, { amount: '', token: null, isDropdownOpen: false }]);
   };
 
+  // 0xC8A41174EC57343bFbadaDA0b30901566676220A
 
   const AddTodoAddressFunction = ()=>{
-    setTodoAdressData((prev)=>[...prev,todoAddAddress])
-    setTodoAddAddress("")
+    if(todoAddAddress.length===42){
+      setTodoAdressData((prev)=>[...prev,todoAddAddress])
+    }
+    else{
+      setTodoAddAddress("")
+      alert("address should be 42 digit long")
+    }
   }
 
   // console.log(forAmounts)
@@ -740,10 +744,11 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
 
   const handleClick = (e) => {
     const bar = e.target.getBoundingClientRect();
+    // console.log(bar)
     const clickPosition = e.clientX - bar.left;
     const barWidth = bar.width;
     const newChunkSize = Math.round((clickPosition / barWidth) * 100);
-    SetPartialFillChunkSize(newChunkSize);
+    SetPartialFillChunkSize(newChunkSize<=2? 2 :newChunkSize);
   };
 
   // Function to handle hover for tooltip
@@ -752,7 +757,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
     const hoverPosition = e.clientX - bar.left;
     const barWidth = bar.width;
     const hoverChunkSize = Math.round((hoverPosition / barWidth) * 100);
-    setTooltip({ position: hoverPosition, chunkSize: hoverChunkSize });
+    setTooltip({ position: hoverPosition, chunkSize: hoverChunkSize<=2?2:hoverChunkSize });
   };
 
   const handleMouseLeave = () => setTooltip(null);
@@ -791,7 +796,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
                 onMouseLeave={() => setShowInfo(false)}
               />
               {showInfo && (
-                <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
+                <div className="absolute top-0 left-full bg-gray-950 bg-opacity-100 p-2 rounded shadow text-xs w-20 text-gray-500">
                   The Amount of Token you want to buy
                 </div>
               )}
@@ -800,7 +805,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
           <input
             type="number"
             inputMode="numeric"
-            value={offerAmount}
+            value={offerAmount===0 ? "": offerAmount}
             onChange={(e) => SetOfferAmount(e.target.value)}
             placeholder="Enter amount to offer"
             className=" bg-transparent px-2 py-1 mt-2 w-full sm:w-auto outline-none border-none text-white text-xl"
@@ -849,14 +854,14 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
         </div>
       </div>
 
-      <span className=" absolute rounded-full p-[6px] shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[157px] ">
+      <span className=" absolute rounded-full p-[6px] z-10 shadow-xl bg-[#15161b] bg-opacity-1 border border-gray-800 left-[45%] top-[157px] ">
         <AiOutlineArrowDown className="" />
       </span>
 
       {/* For */}
 
      
-     <div id='forAmountScrollbar' className=' flex flex-col max-h-[244px] overflow-y-auto'>     
+     <div id='forAmountScrollbar' className=' flex flex-col '>     
       {
   forAmounts.map((forAmount, index) => (
     <div
@@ -865,7 +870,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
         boxShadow:
           '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
       }}
-      className="flex flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
+      className="flex relative flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
     >
       <div className="flex items-start flex-col w-full sm:w-auto">
         <div className="flex items-center w-full">
@@ -883,7 +888,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
               onMouseLeave={() => setShowInfo1(false)}
             />
             {showInfo1 && (
-              <div className="absolute top-0 left-full bg-gray-950 bg-opacity-80 p-2 rounded shadow text-xs w-20 text-gray-500">
+              <div className="absolute top-0 left-full bg-gray-950 bg-opacity-100 p-2 rounded shadow text-xs w-20 text-gray-500">
                 The Amount you are paying
               </div>
             )}
@@ -900,7 +905,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
       </div>
 
       <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
-        <div className=" w-full sm:w-auto">
+        <div className=" relative w-full sm:w-auto">
           <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
             Balance <strong className="text-white">0 ETH</strong>
           </span>
@@ -923,9 +928,13 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
             </button>
             
           </div>
+        </div>
+       
+        
+      </div>
 
-          {forAmount.isDropdownOpen && (
-            <div className="absolute z-[99999] mt-1 w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
+        {forAmount.isDropdownOpen && (
+            <div className="absolute right-1 top-20 z-[99999]  w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
               <ul className="py-1">
                 {chainOptions.map((chain, idx) => (
                   <li key={idx}>
@@ -945,28 +954,24 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
               </ul>
             </div>
           )}
-          
-        </div>
-        
-      </div>
       
     </div>
   ))
 }
-           <button disabled={forAmounts.length===6}
+           
+
+     </div>
+
+     <button disabled={forAmounts.length===6}
               onClick={addForAmount}
               className="cursor-pointer rounded-[5px] mt-2 font-semibold bg-[#fec949] w-[99%] py-1 mx-auto text-black "
             >
               Add More Token
             </button>
 
-     </div>
-
-     
-
       <div className="flex flex-col items-start p-2 mt-2">
         <h1 className="text-gray-500 font-bold text-[13px]">FILL TYPE</h1>
-
+         <div onClick={()=>SetPartialFillChunkSize(2)}>
         <div className="container">
           <input
             type="radio"
@@ -978,34 +983,39 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
           <span className="checkmark"></span>
           <span className="ms-7 text-white text-sm">Partial Fill</span>
         </div>
-        <p className="ms-7 text-sm text-gray-500 w-[80%]">
+        <p className="ms-7 text-sm text-gray-500">
           Multiple Users can contribute to fulfill their offer
         </p>
+        </div>
         {
             selectedOption === "Partial Fill" &&  
-            <div className="flex w-full flex-col mt-6">
+            <div className="flex relative w-full flex-col mt-6">
             {/* Progress bar container */}
+            <div className='w-full z-50 h-5 relative flex items-center'>
+            <style>{`
+        .progress-bar::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 9px;
+          height: 2px;
+          background-color: #00e641;
+          border-radius: 999px;
+          width: ${PartialFillChunkSize}%;
+          z-index: 999;
+        }
+      `}</style>
             <div
-              className="relative w-full h-[2px] bg-gray-300 rounded-full"
+              className=" w-full h-[2px] bg-gray-300 bg-opacity-30 rounded-full progress-bar"
               onClick={handleClick}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
               {/* Filled part of the progress bar */}
-              <div
-                className="absolute top-0 left-0 h-full bg-[#00e641] rounded-full"
-                style={{ width: `${PartialFillChunkSize}%` }}
-              ></div>
+                
       
               {/* Circles for fixed breakpoints */}
-              <div className="absolute -top-[7px]   left-0 flex justify-between w-full">
-                {[2, 25, 50, 75, 100].map((value) => (
-                  <div
-                    key={value}
-                    className={`w-4 h-4 ${PartialFillChunkSize >= value ? 'bg-[#00e641]' : 'bg-slate-600 border-gray-400'} cursor-pointer rounded-full`}
-                  ></div>
-                ))}
-              </div>
+              
       
               {/* Tooltip for hover value */}
               {tooltip && (
@@ -1017,9 +1027,18 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
                 </div>
               )}
             </div>
+            </div>
+            <div className="absolute top-[1px]  left-0 bg-opacity-100 flex justify-between w-full">
+                {[2, 25, 50, 75, 100].map((value) => (
+                  <div
+                    key={value}
+                    className={`w-4 h-4 ${PartialFillChunkSize >= value ? 'bg-[#00e641]' : 'bg-slate-600 border-gray-400 bg-opacity-100'} cursor-pointer bg-opacity-100 rounded-full`}
+                  ></div>
+                ))}
+              </div>
       
             {/* Labels below the progress bar */}
-            <div className="flex justify-between mt-2 ms-1 text-gray-400">
+            <div className="flex justify-between mb-1 ms-1 text-gray-400">
               <p className="text-xs">2</p>
               <p className="text-xs">25</p>
               <p className="text-xs">50</p>
@@ -1045,6 +1064,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
         </p>
         </div>
 
+        <div >
         <div className="container">
           <input
             type="radio"
@@ -1059,6 +1079,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
         <p className="ms-7 text-sm text-gray-500 w-[80%]">
           Offer can only be filled by whitelisted user
         </p>
+        </div>
         {
             selectedOption === 'Private Fill' && <div className='w-full mt-6 p-4 bg-[#15161B] rounded-lg shadow-md'>
             <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
