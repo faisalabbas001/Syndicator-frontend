@@ -30,10 +30,14 @@ import {
 } from '@wagmi/core';
 import{ethers}from 'ethers';
 import { abi, contractAddress } from '../BlockChainContext/helper';
-import { parseEther } from 'viem';
+import { nonceManager, parseEther } from 'viem';
 import { config } from '../BlockChainContext/config';
 let equivalent_asset;
 let OfferAmount1;
+let NoOfChunks;
+let offeraddress1;
+let groups;
+
 const OfferMarketCard = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [totalSteps, setTotalSteps] = useState(3);
@@ -64,7 +68,8 @@ const OfferMarketCard = () => {
   };
   const handleSubmit = async () => {
     try {
-      console.log(equivalent_asset, OfferAmount1);
+      
+  console.log(NoOfChunks,OfferAmount1,offeraddress1,equivalent_asset);
       const { request } = await simulateContract(config, {
         abi: abi,
         address: contractAddress,
@@ -86,6 +91,99 @@ const OfferMarketCard = () => {
     }
   };
 
+  const handleSubmit2=async ()=>{
+    try {
+      if (equivalent_asset.length==1){
+        if(offeraddress1=="0x0000000000000000000000000000000000000000"){
+
+          const { request } = await simulateContract(config, {
+            abi: abi,
+            address: contractAddress,
+            functionName: 'create_single_coin_offer',
+            args: [equivalent_asset,NoOfChunks],
+            value: parseEther(OfferAmount1.toString()),
+          });
+    
+          const hash = await writeContract(config, request);
+          const transactionReceipt = await waitForTransactionReceipt(config, {
+            // confirmations: 2,
+            hash: hash,
+          });
+          console.log(transactionReceipt);
+
+        }else{
+
+          const { request } = await simulateContract(config, {
+            abi: abi,
+            address: contractAddress,
+            functionName: 'create_single_token_offer',
+            args: [equivalent_asset[0],NoOfChunks,OfferAmount1,offeraddress1],
+          });
+    
+          const hash = await writeContract(config, request);
+          const transactionReceipt = await waitForTransactionReceipt(config, {
+            // confirmations: 2,
+            hash: hash,
+          });
+          console.log(transactionReceipt);
+
+
+        }
+
+
+
+
+      }else if(equivalent_asset.length>1){
+        if(offeraddress1=="0x0000000000000000000000000000000000000000"){
+          const { request } = await simulateContract(config, {
+            abi: abi,
+            address: contractAddress,
+            functionName: 'create_multi_coin_offer',
+            args: [equivalent_asset,NoOfChunks],
+            value: parseEther(OfferAmount1.toString()),
+          });
+    
+          const hash = await writeContract(config, request);
+          const transactionReceipt = await waitForTransactionReceipt(config, {
+            // confirmations: 2,
+            hash: hash,
+          });
+          console.log(transactionReceipt);
+
+
+
+
+        }else{
+          const { request } = await simulateContract(config, {
+            abi: abi,
+            address: contractAddress,
+            functionName: 'create_multi_token_offer',
+            args: [equivalent_asset,NoOfChunks,OfferAmount1,offeraddress1],
+            value: parseEther(OfferAmount1.toString()),
+          });
+    
+          const hash = await writeContract(config, request);
+          const transactionReceipt = await waitForTransactionReceipt(config, {
+            // confirmations: 2,
+            hash: hash,
+          });
+
+
+
+        }
+
+
+
+      }
+
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
+
+  }
+
   const handleNextClick = () => {
     setShowModal(true);
   };
@@ -93,6 +191,7 @@ const OfferMarketCard = () => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
   return (
     <>
       <div
@@ -516,12 +615,13 @@ const Card2 = () => {
   const [selectedOption, setSelectedOption] = useState('Partial Fill');
   const [todoAddAddress,setTodoAddAddress] = useState('');
   const [todoAddressData,setTodoAdressData] = useState([]);
-  const [offerAmount, SetOfferAmount] = useState();
+  const [offerAmount, SetOfferAmount] = useState(0);
   const [ForAmount, SetForAmount] = useState(0);
   const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(2);
   const [tooltip, setTooltip] = useState(null);
 const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropdownOpen: false }]);
   OfferAmount1 = offerAmount;
+  NoOfChunks = PartialFillChunkSize;
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -572,11 +672,19 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
 
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());
-  equivalent_asset = [
-    ethers.utils.parseUnits(ForAmount.toString(),"ether"),
-    selectedChain1.address
-  ];
-
+  const assetsData = forAmounts && forAmounts.map((val,ind)=>{
+    return (
+      {
+        chunk_size: ethers.utils.parseUnits((val?.amount/PartialFillChunkSize).toString(),"ether") ,
+        asset_address: val.token?.address,
+      }
+    )
+  })
+  // console.log(assetsData)
+  offeraddress1=selectedChain?.address
+  console.log(offeraddress1)
+  equivalent_asset =  assetsData;
+  groups = todoAddressData;
   const toggleDropdownAddedBox = (index) => {
     setForAmounts((prev) =>
       prev.map((item, i) => (i === index ? { ...item, isDropdownOpen: !item.isDropdownOpen } : item))
@@ -920,6 +1028,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
             </div>
           </div>
           }
+        <div onClick={()=>SetPartialFillChunkSize(1)}>
         <div className="container">
           <input
             type="radio"
@@ -934,6 +1043,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
         <p className="ms-7 text-sm text-gray-500">
           Entire Offer must be filled by 1 user
         </p>
+        </div>
 
         <div className="container">
           <input
