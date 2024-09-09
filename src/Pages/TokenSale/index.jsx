@@ -1,4 +1,5 @@
-import { useLocation } from "react-router-dom";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useLocation, useNavigate } from "react-router-dom";
 
 // import { FaBitcoin, FaEthereum } from 'react-icons/fa';
 import { FiExternalLink, FiArrowRight, FiArrowDown } from "react-icons/fi";
@@ -8,29 +9,45 @@ import {
   getTokenImage,
   getTokenSymbol,
   getTokenName,
-  checkFill
+  // checkFill
 } from "../../utils/ReuseFuntions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TokenSale = () => {
   const location = useLocation();
   const stateData = location.state;
   const [tooltip, setTooltip] = useState(null);
+  const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(1);
+  const [BuyingValue, SetBuyingValue] = useState(formater(stateData.amount));
+  const [ForValue, SetForValue] = useState(formater(stateData.requested_assets[0].chunk_size));
+  const Navigate = useNavigate();
+
+
+
+  // Function to handle hover for tooltip
+  const handleClick = (e) => {
+    const bar = e.target.getBoundingClientRect();
+    // console.log(bar)
+    const clickPosition = e.clientX - bar.left;
+    const barWidth = bar.width;
+    const newChunkSize = Math.round((clickPosition / barWidth) * stateData.CalculatedChunkSize);
+    SetPartialFillChunkSize(newChunkSize <= 1 ? 1 : newChunkSize);
+  };
 
   // Function to handle hover for tooltip
   const handleMouseMove = (e) => {
     const bar = e.target.getBoundingClientRect();
     const hoverPosition = e.clientX - bar.left;
     const barWidth = bar.width;
-    const hoverChunkSize = Math.round((hoverPosition / barWidth) * 100);
+    const hoverChunkSize = Math.round((hoverPosition / barWidth) * stateData.CalculatedChunkSize);
     setTooltip({
       position: hoverPosition,
-      chunkSize: hoverChunkSize <= 2 ? 2 : hoverChunkSize,
+      chunkSize: hoverChunkSize <= 1 ? 1 : hoverChunkSize,
     });
   };
 
   const handleMouseLeave = () => setTooltip(null);
-
+  console.log(PartialFillChunkSize);
   console.log("stateData", stateData);
 
   const progressPercentage = 43;
@@ -40,6 +57,15 @@ const TokenSale = () => {
   }
   console.log("stateData", stateData);
 
+  useEffect(() => {
+    // Ensure the formater function returns a number or convert the result to a number
+    const formattedChunkSize = Number(formater(stateData.selectedChain.chunk_size));
+    const formattedAmount = Number(formater(stateData.amount));
+  
+    // Perform the calculations and update the state
+    SetForValue((formattedChunkSize * PartialFillChunkSize) / 100);
+    SetBuyingValue((formattedAmount * PartialFillChunkSize) / 100);
+  }, [PartialFillChunkSize, stateData.amount, stateData.requested_assets]);
 
   return (
     <div className="bg-transparent text-white p-1 py-3 sm:p-6 min-h-screen flex flex-col lg:flex-row justify-between gap-3 sm:gap-9 ">
@@ -62,9 +88,10 @@ const TokenSale = () => {
                 </h2>
                 <p className="text-xs text-blue-600 font-semibold">
                   {/* PARTIAL FILL */}
-                  {
-                    checkFill(stateData.amount,stateData.owned_asset.chunkSize)
-                  }
+                  {stateData.amount.toString() ===
+                  stateData.owned_asset.chunk_size.toString()
+                    ? "Entire Fill"
+                    : "Partial Fill"}
                 </p>
               </div>
               {/* circle  */}
@@ -234,7 +261,7 @@ const TokenSale = () => {
             </div>
           </div>
         </div>
-        <button className="bg-gray-500 opacity-75 w-full py-2 rounded-lg rounded-t-none">
+        <button onClick={()=>Navigate("/")}  className="bg-gray-500 opacity-75 w-full py-2 rounded-lg rounded-t-none">
           Back
         </button>
       </div>
@@ -277,7 +304,7 @@ const TokenSale = () => {
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between pb-7">
                 {" "}
                 <p className="text-xl font-semibold text-stone-300">
-                  {formater(stateData.amount)}
+                  {BuyingValue}
                 </p>{" "}
                 <p className=" text-gray-400  text-xs">
                   <img
@@ -302,7 +329,7 @@ const TokenSale = () => {
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between pb-7">
                 {" "}
                 <p className="text-xl font-semibold text-stone-300">
-                  {formater(stateData.requested_assets[0].chunk_size)}
+                  {ForValue}
                 </p>{" "}
                 <p className=" text-gray-400  text-xs">
                   <img
@@ -319,6 +346,7 @@ const TokenSale = () => {
               <FiArrowDown />
             </span>
           </div>
+          {/* Progress bar */}
           <div className="flex relative w-full flex-col mt-6">
             {/* Progress bar container */}
             <div className="w-full z-50 h-5 relative flex items-center">
@@ -331,13 +359,13 @@ const TokenSale = () => {
           height: 2px;
           background-color: #00e641;
           border-radius: 999px;
-          width: 50%;
+          width: ${Math.floor(PartialFillChunkSize/stateData.CalculatedChunkSize*100)}%;
           z-index: 999;
         }
       `}</style>
               <div
                 className=" w-full h-[2px] bg-gray-300 bg-opacity-30 rounded-full progress-bar"
-                // onClick={handleClick}
+                onClick={handleClick}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
               >
@@ -360,12 +388,13 @@ const TokenSale = () => {
               </div>
             </div>
             <div className="absolute top-[1px]  left-0 bg-opacity-100 flex justify-between w-full">
-              {[2, 25, 50, 75, 100].map((value) => (
+              {[1,  stateData.CalculatedChunkSize].map((value) => (
                 <div
                   key={value}
                   className={`w-4 h-4 ${
-
-                       'bg-slate-600 border-gray-400 bg-opacity-100'
+                    PartialFillChunkSize >= value
+                      ? 'bg-[#00e641]'
+                      : 'bg-slate-600 border-gray-400 bg-opacity-100'
                   } cursor-pointer bg-opacity-100 rounded-full`}
                 ></div>
               ))}
@@ -373,13 +402,12 @@ const TokenSale = () => {
 
             {/* Labels below the progress bar */}
             <div className="flex justify-between mb-1 ms-1 text-gray-400">
-              <p className="text-xs">2</p>
-              <p className="text-xs">25</p>
-              <p className="text-xs">50</p>
-              <p className="text-xs">75</p>
-              <p className="text-xs">100</p>
+              <p className="text-xs">1</p>
+              
+              <p className="text-xs">{stateData.CalculatedChunkSize}</p>
             </div>
           </div>
+          {/* End of progress bar */}
         </div>
         <button className="bg-blue-500 w-full py-3 mb-3 font-semibold rounded-lg text-stone-100 rounded-t-none">
           Execute Order

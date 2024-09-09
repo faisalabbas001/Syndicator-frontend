@@ -8,7 +8,7 @@ import { formater } from "../BlockChainContext/helper";
 import { FiChevronDown } from "react-icons/fi";
 import { useState } from "react";
 import { getTokenImage, getTokenName } from "../utils/ReuseFuntions";
-const OTCcard = ({ data,ind,ismultitoken,isEthereum }) => {
+const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState({
     chunk_size: "",
@@ -212,7 +212,7 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum }) => {
           <span className="">
             <Link
               to={`token-sale/bonk`}
-              state={{ ...data, selectedChain,ind,ismultitoken,isEthereum }}
+              state={{ ...data, selectedChain,ind,ismultitoken,isEthereum,CalculatedChunkSize }}
               className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white"
             >
               <span>Buy</span>

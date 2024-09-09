@@ -70,7 +70,7 @@ const Home = () => {
         <div className="md:py-3 px-2 md:px-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-3 text-white">
           {data && data.map((val, ind) => (
             <div key={ind} className="py-1 md:py-0">
-              <OTCcard key={ind} data={val} ind={ind} ismultitoken={val.requested_assets.length > 1 ? true : false} isEthereum={val.owned_asset.asset_address === "0x0000000000000000000000000000000000000000" ? true : false} />
+              <OTCcard key={ind} data={val} ind={ind} ismultitoken={val.requested_assets.length > 1 ? true : false} isEthereum={val.owned_asset.asset_address === "0x0000000000000000000000000000000000000000" ? true : false} CalculatedChunkSize={val.amount.toString()/val.owned_asset.chunk_size.toString()} />
             </div>
           ))}
         </div>

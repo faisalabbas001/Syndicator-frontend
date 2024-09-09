@@ -835,6 +835,8 @@ const Card2 = () => {
   const handleMouseLeave = () => setTooltip(null);
   console.log(PartialFillChunkSize);
 
+
+  //check function for private fill
   const handlechecked=(e)=>{
     setischecked(e.target.checked)
   }
