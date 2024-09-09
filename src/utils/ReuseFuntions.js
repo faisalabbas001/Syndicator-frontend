@@ -58,9 +58,9 @@
 
   // Get Token Name from chain address
 
- export const getTokenName = (address) => { 
+ export const getTokenSymbol = (address) => { 
     if (address === '0x0000000000000000000000000000000000000000') {
-      return 'ETHERIUM';
+      return 'ETH';
     }
     else if (address === '0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931') {
       return 'PEPE';
@@ -69,10 +69,10 @@
       return 'SyndicatorLabs';
   }
   else if (address === '0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7') {
-      return 'Bitcoin';
+      return 'BTC';
     }
     else if (address === '0x9bc8388dD439fa3365B1F78A81242aDBB4677759') {
-      return 'Doge';
+      return 'DOGE';
     }
     else if (address === '0xe6714a67cabd598882C42e2719908E648E734ec3') {
       return 'FI';
@@ -80,4 +80,35 @@
     else {
       return 'TEST-TOKEN';
     }
+  };
+ export const getTokenName= (address) => { 
+    if (address === '0x0000000000000000000000000000000000000000') {
+      return 'Etherium';
+    }
+    else if (address === '0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931') {
+      return 'Pepe';
+    }
+    else if (address === '0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb') {      
+      return 'SyndicatorLabs';
+  }
+  else if (address === '0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7') {
+      return 'Bitcoin';
+    }
+    else if (address === '0x9bc8388dD439fa3365B1F78A81242aDBB4677759') {
+      return 'Dogecoin';
+    }
+    else if (address === '0xe6714a67cabd598882C42e2719908E648E734ec3') {
+      return 'Fideum';
+    }
+    else {
+      return 'TEST-TOKEN';
+    }
+  };
+ export const checkFill = (amount,chunk_size) => { 
+  if (amount===chunk_size) {
+    return "Entire Fill"
+  }
+  else{
+    return "Partial Fill"
+  }
   };
