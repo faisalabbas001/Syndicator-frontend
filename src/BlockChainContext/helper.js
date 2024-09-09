@@ -985,9 +985,232 @@ export const  abi=[
 		"type": "function"
 	}
 ];
-export const contractAddress="0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const contractAddress="0x4C2621766B11784C0472200C3b1DfE654C5A7188";
 export const decimal=18;
 export const formater=(value)=>{
     return ethers.utils.formatUnits(Number(value).toString(),decimal);
 
 }
+export const erc20Abi = [
+	{
+	  constant: true,
+	  inputs: [],
+	  name: 'name',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'string',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  constant: false,
+	  inputs: [
+		{
+		  name: '_spender',
+		  type: 'address',
+		},
+		{
+		  name: '_value',
+		  type: 'uint256',
+		},
+	  ],
+	  name: 'approve',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'bool',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'nonpayable',
+	  type: 'function',
+	},
+	{
+	  constant: true,
+	  inputs: [],
+	  name: 'totalSupply',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'uint256',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  constant: false,
+	  inputs: [
+		{
+		  name: '_from',
+		  type: 'address',
+		},
+		{
+		  name: '_to',
+		  type: 'address',
+		},
+		{
+		  name: '_value',
+		  type: 'uint256',
+		},
+	  ],
+	  name: 'transferFrom',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'bool',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'nonpayable',
+	  type: 'function',
+	},
+	{
+	  constant: true,
+	  inputs: [],
+	  name: 'decimals',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'uint8',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  constant: true,
+	  inputs: [
+		{
+		  name: '_owner',
+		  type: 'address',
+		},
+	  ],
+	  name: 'balanceOf',
+	  outputs: [
+		{
+		  name: 'balance',
+		  type: 'uint256',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  constant: true,
+	  inputs: [],
+	  name: 'symbol',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'string',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  constant: false,
+	  inputs: [
+		{
+		  name: '_to',
+		  type: 'address',
+		},
+		{
+		  name: '_value',
+		  type: 'uint256',
+		},
+	  ],
+	  name: 'transfer',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'bool',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'nonpayable',
+	  type: 'function',
+	},
+	{
+	  constant: true,
+	  inputs: [
+		{
+		  name: '_owner',
+		  type: 'address',
+		},
+		{
+		  name: '_spender',
+		  type: 'address',
+		},
+	  ],
+	  name: 'allowance',
+	  outputs: [
+		{
+		  name: '',
+		  type: 'uint256',
+		},
+	  ],
+	  payable: false,
+	  stateMutability: 'view',
+	  type: 'function',
+	},
+	{
+	  payable: true,
+	  stateMutability: 'payable',
+	  type: 'fallback',
+	},
+	{
+	  anonymous: false,
+	  inputs: [
+		{
+		  indexed: true,
+		  name: 'owner',
+		  type: 'address',
+		},
+		{
+		  indexed: true,
+		  name: 'spender',
+		  type: 'address',
+		},
+		{
+		  indexed: false,
+		  name: 'value',
+		  type: 'uint256',
+		},
+	  ],
+	  name: 'Approval',
+	  type: 'event',
+	},
+	{
+	  anonymous: false,
+	  inputs: [
+		{
+		  indexed: true,
+		  name: 'from',
+		  type: 'address',
+		},
+		{
+		  indexed: true,
+		  name: 'to',
+		  type: 'address',
+		},
+		{
+		  indexed: false,
+		  name: 'value',
+		  type: 'uint256',
+		},
+	  ],
+	  name: 'Transfer',
+	  type: 'event',
+	},
+  ];
+export const testTokenAddress="0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f";

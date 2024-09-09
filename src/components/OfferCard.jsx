@@ -28,15 +28,17 @@ import {
   writeContract,
   waitForTransactionReceipt,
 } from '@wagmi/core';
-import{ethers}from 'ethers';
-import { abi, contractAddress } from '../BlockChainContext/helper';
+import { ethers } from 'ethers';
+import { abi, contractAddress,erc20Abi,testTokenAddress } from '../BlockChainContext/helper';
 import { nonceManager, parseEther } from 'viem';
 import { config } from '../BlockChainContext/config';
+import toast from 'react-hot-toast';
 let equivalent_asset;
 let OfferAmount1;
 let NoOfChunks;
 let offeraddress1;
 let groups;
+let includeSelf = false;
 
 const OfferMarketCard = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -44,6 +46,7 @@ const OfferMarketCard = () => {
   //   const [selected, setSelected] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showModal, setShowModal] = useState(false);
+
   const handleNext = () => {
     if (activeStep < totalSteps) {
       setActiveStep(activeStep + 1);
@@ -66,123 +69,166 @@ const OfferMarketCard = () => {
       setProgress(0);
     }
   };
-  const handleSubmit = async () => {
-    try {
-      
-  console.log(NoOfChunks,OfferAmount1,offeraddress1,equivalent_asset);
-      const { request } = await simulateContract(config, {
-        abi: abi,
-        address: contractAddress,
-        functionName: 'create_single_coin_offer',
-        args: [equivalent_asset,1],
-        value: parseEther(OfferAmount1.toString()),
-      });
 
-      const hash = await writeContract(config, request);
-      const transactionReceipt = await waitForTransactionReceipt(config, {
-        // confirmations: 2,
-        hash: hash,
-      });
-      console.log(transactionReceipt);
-      //setReceipt(transactionReceipt);
+
+  const tokenApproval=async (value)=>{
+    try{
+    const { request } = await simulateContract(config, {
+      abi: erc20Abi,
+      address: testTokenAddress,
+      functionName: "approve",
+      //cook totalPrice
+      args: [contractAddress, parseEther(value)],
+    });
+    const hash = await writeContract(config, request);
+    const transactionReceipt = await waitForTransactionReceipt(config, {
+      // confirmations: 2,
+      hash: hash,
+    });
+    console.log('token Aapproved');
+    toast.success("Token Approved");
+  }catch(error){
+    console.log(error);
+  }
+}
+
+  const addUserGroup = async (scenario) => {
+    try {
+      if (groups.length > 0) {
+        const { request } = await simulateContract(config, {
+          abi: abi,
+          address: contractAddress,
+          functionName: 'create_user_group',
+          args: [includeSelf, groups],
+        });
+
+        const hash = await writeContract(config, request);
+        const transactionReceipt = await waitForTransactionReceipt(config, {
+          // confirmations: 2,
+          hash: hash,
+        });
+        console.log(
+          `hash for scenario${scenario} , user group added ` + transactionReceipt
+        );
+        toast.success("The offer is now private");
+      }
     } catch (error) {
       console.log(error);
-      alert('There is some error in transaction, Please try again'); // Toast notification
     }
   };
 
-  const handleSubmit2=async ()=>{
+  const handleSubmit2 = async () => {
     try {
-      if (equivalent_asset.length==1){
-        if(offeraddress1=="0x0000000000000000000000000000000000000000"){
-
+      if (equivalent_asset.length == 1) {
+        //scenario 1
+        if (offeraddress1 == '0x0000000000000000000000000000000000000000') {
+          //scenario 1.1
+        //  console.log(OfferAmount1);
+        //  console.log(equivalent_asset);
+        //  console.log(NoOfChunks);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
             functionName: 'create_single_coin_offer',
-            args: [equivalent_asset,NoOfChunks],
+            args: [equivalent_asset[0], NoOfChunks],
             value: parseEther(OfferAmount1.toString()),
           });
-    
+          //console.log("2")
+
           const hash = await writeContract(config, request);
           const transactionReceipt = await waitForTransactionReceipt(config, {
             // confirmations: 2,
             hash: hash,
           });
-          console.log(transactionReceipt);
+          console.log(
+            'hash for scenario 1.1, offerCreated ' + transactionReceipt
+          );
+          toast.success("Offer created successfully");
 
-        }else{
-
+          if (groups.length > 0) {
+            await addUserGroup('1.1');
+          }
+        } else {
+          //scenario 1.2
+          await tokenApproval(OfferAmount1);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
             functionName: 'create_single_token_offer',
-            args: [equivalent_asset[0],NoOfChunks,OfferAmount1,offeraddress1],
+            args: [
+              equivalent_asset[0],
+              NoOfChunks,
+              OfferAmount1,
+              offeraddress1,
+            ],
           });
-    
+
           const hash = await writeContract(config, request);
           const transactionReceipt = await waitForTransactionReceipt(config, {
             // confirmations: 2,
             hash: hash,
           });
-          console.log(transactionReceipt);
+          console.log(
+            'hash for scenario 1.2, offerCreated ' + transactionReceipt
+          );
+          toast.success("Offer created successfully");
 
-
+          if (groups.length > 0) {
+            await addUserGroup('1.2');
+          }
         }
-
-
-
-
-      }else if(equivalent_asset.length>1){
-        if(offeraddress1=="0x0000000000000000000000000000000000000000"){
+      } else if (equivalent_asset.length > 1) {
+        //scenario 2
+        if (offeraddress1 == '0x0000000000000000000000000000000000000000') {
+          //scenario 2.1
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
             functionName: 'create_multi_coin_offer',
-            args: [equivalent_asset,NoOfChunks],
+            args: [equivalent_asset, NoOfChunks],
             value: parseEther(OfferAmount1.toString()),
           });
-    
+
           const hash = await writeContract(config, request);
           const transactionReceipt = await waitForTransactionReceipt(config, {
             // confirmations: 2,
             hash: hash,
           });
-          console.log(transactionReceipt);
-
-
-
-
-        }else{
+          console.log(
+            'hash for scenario 2.1, offerCreated ' + transactionReceipt
+          );
+          toast.success("Offer created successfully");
+          if(groups.length>0){
+            await addUserGroup("2.1");
+          }
+        } else {
+          //scenario 2.2
+          await tokenApproval(OfferAmount1);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
             functionName: 'create_multi_token_offer',
-            args: [equivalent_asset,NoOfChunks,OfferAmount1,offeraddress1],
-            value: parseEther(OfferAmount1.toString()),
+            args: [equivalent_asset, NoOfChunks, OfferAmount1, offeraddress1],
           });
-    
+
           const hash = await writeContract(config, request);
           const transactionReceipt = await waitForTransactionReceipt(config, {
             // confirmations: 2,
             hash: hash,
           });
-
-
-
+          console.log(
+            'hash for scenario 2.2, offerCreated ' + transactionReceipt
+          );
+          toast.success("Offer created successfully");
+          if(groups.length>0){
+            await addUserGroup("2.2");
+          }
         }
-
-
-
       }
-
-      
     } catch (error) {
       console.log(error);
-      
     }
-
-  }
+  };
 
   const handleNextClick = () => {
     setShowModal(true);
@@ -230,7 +276,7 @@ const OfferMarketCard = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSubmit}
+                  onClick={handleSubmit2}
                   className="bg-[#ffc848] text-black px-4 py-2 rounded-md mt-2 mx-auto w-[92%] md:w-full  "
                 >
                   Deposit 10 MACH7
@@ -612,22 +658,26 @@ const Card2 = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Partial Fill');
-  const [todoAddAddress,setTodoAddAddress] = useState('');
-  const [todoAddressData,setTodoAdressData] = useState([]);
+  const [todoAddAddress, setTodoAddAddress] = useState('');
+  const [todoAddressData, setTodoAdressData] = useState([]);
   const [offerAmount, SetOfferAmount] = useState(0);
   const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(2);
   const [tooltip, setTooltip] = useState(null);
-const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropdownOpen: false }]);
+  const [ischecked, setischecked] = useState(false);
+  const [forAmounts, setForAmounts] = useState([
+    { amount: '', token: null, isDropdownOpen: false },
+  ]);
   OfferAmount1 = offerAmount;
   NoOfChunks = PartialFillChunkSize;
+  includeSelf;
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-
   const handleChainSelect = (chain) => {
     if (forAmounts.some((item) => item.token?.name === chain.name)) {
-      alert('This token is already selected in forAmounts. Please choose another token.');
+   
+      toast.error('This token is already selected in forAmounts. Please choose another token.');
       return;
     }
     setSelectedChain(chain);
@@ -640,6 +690,10 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
       name: 'ETH',
       icon: '/assets/images/Ethereum_logo.png',
       address: '0x0000000000000000000000000000000000000000',
+    },{
+      name: 'syn-test',
+      icon: '/assets/images/Ethereum_logo.png',
+      address: '0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f',
     },
     {
       name: 'PEPE',
@@ -670,77 +724,92 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
 
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());
-  const assetsData = forAmounts && forAmounts.map((val,ind)=>{
-    return (
-      {
-        chunk_size: ethers.utils.parseUnits((val?.amount/PartialFillChunkSize).toString(),"ether") ,
+  const assetsData =
+    forAmounts &&
+    forAmounts.map((val, ind) => {
+      return {
+        chunk_size: ethers.utils.parseUnits(
+          (val?.amount / PartialFillChunkSize).toString(),
+          'ether'
+        ),
         asset_address: val.token?.address,
-      }
-    )
-  })
+      };
+    });
   // console.log(assetsData)
-  offeraddress1=selectedChain?.address
-  console.log(offeraddress1)
-  equivalent_asset =  assetsData;
+  offeraddress1 = selectedChain?.address;
+  console.log(offeraddress1);
+  equivalent_asset = assetsData;
   groups = todoAddressData;
   const toggleDropdownAddedBox = (index) => {
     setForAmounts((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, isDropdownOpen: !item.isDropdownOpen } : item))
+      prev.map((item, i) =>
+        i === index ? { ...item, isDropdownOpen: !item.isDropdownOpen } : item
+      )
     );
   };
-  
+
   const handleTokenSelect = (index, token) => {
     if (forAmounts.some((item) => item.token?.name === token.name)) {
-      alert('This token has already been selected in another box. Please choose a different token.');
+      
+      toast.error('This token has already been selected in another box. Please choose a different token.');
       return;
     }
 
     if (token.name === selectedChain?.name) {
-      alert('This token is already selected for the offer amount. Please choose another token.');
+ 
+      toast.error('This token is already selected for the offer amount. Please choose another token.');
+      
       return;
     }
     setForAmounts((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, token, isDropdownOpen: false } : item))
+      prev.map((item, i) =>
+        i === index ? { ...item, token, isDropdownOpen: false } : item
+      )
     );
   };
-  
+
   // Handle forAmount input change for a specific index
   const handleForAmountChange = (index, amount) => {
-    setForAmounts((prev) => prev.map((item, i) => (i === index ? { ...item, amount } : item)));
+    setForAmounts((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, amount } : item))
+    );
   };
-  
+
   // Add a new forAmount field
   const addForAmount = () => {
-    const allValid = forAmounts.every(item => item.amount && item.token);
-    
+    const allValid = forAmounts.every((item) => item.amount && item.token);
+
     if (!allValid) {
-      alert("Please fill the certain fields");
+    
+      toast.error('Please fill the certain fields');
       return;
     }
-  
+
     if (forAmounts.length >= 5) {
-      alert("Limit exceeded");
+      toast.error('Limit exceeded');
       return;
     }
-  
-    setForAmounts((prev) => [...prev, { amount: '', token: null, isDropdownOpen: false }]);
+
+    setForAmounts((prev) => [
+      ...prev,
+      { amount: '', token: null, isDropdownOpen: false },
+    ]);
   };
 
   // 0xC8A41174EC57343bFbadaDA0b30901566676220A
 
-  const AddTodoAddressFunction = ()=>{
-    if(todoAddAddress.length===42){
-      setTodoAdressData((prev)=>[...prev,todoAddAddress])
+  const AddTodoAddressFunction = () => {
+    if (todoAddAddress.length === 42) {
+      setTodoAdressData((prev) => [...prev, todoAddAddress]);
+    } else {
+      setTodoAddAddress('');
+      toast.error('address should be 42 digit long');
     }
-    else{
-      setTodoAddAddress("")
-      alert("address should be 42 digit long")
-    }
-  }
+  };
 
   // console.log(forAmounts)
 
-  // select chunk size within range 
+  // select chunk size within range
 
   const handleClick = (e) => {
     const bar = e.target.getBoundingClientRect();
@@ -748,7 +817,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
     const clickPosition = e.clientX - bar.left;
     const barWidth = bar.width;
     const newChunkSize = Math.round((clickPosition / barWidth) * 100);
-    SetPartialFillChunkSize(newChunkSize<=2? 2 :newChunkSize);
+    SetPartialFillChunkSize(newChunkSize <= 2 ? 2 : newChunkSize);
   };
 
   // Function to handle hover for tooltip
@@ -757,11 +826,21 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
     const hoverPosition = e.clientX - bar.left;
     const barWidth = bar.width;
     const hoverChunkSize = Math.round((hoverPosition / barWidth) * 100);
-    setTooltip({ position: hoverPosition, chunkSize: hoverChunkSize<=2?2:hoverChunkSize });
+    setTooltip({
+      position: hoverPosition,
+      chunkSize: hoverChunkSize <= 2 ? 2 : hoverChunkSize,
+    });
   };
 
   const handleMouseLeave = () => setTooltip(null);
-  console.log(PartialFillChunkSize)
+  console.log(PartialFillChunkSize);
+
+  const handlechecked=(e)=>{
+    setischecked(e.target.checked)
+  }
+  console.log(ischecked)
+
+  
   return (
     <div
       className=" 
@@ -805,7 +884,7 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
           <input
             type="number"
             inputMode="numeric"
-            value={offerAmount===0 ? "": offerAmount}
+            value={offerAmount === 0 ? '' : offerAmount}
             onChange={(e) => SetOfferAmount(e.target.value)}
             placeholder="Enter amount to offer"
             className=" bg-transparent px-2 py-1 mt-2 w-full sm:w-auto outline-none border-none text-white text-xl"
@@ -860,139 +939,132 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
 
       {/* For */}
 
-     
-     <div id='forAmountScrollbar' className=' flex flex-col '>     
-      {
-  forAmounts.map((forAmount, index) => (
-    <div
-      key={index}
-      style={{
-        boxShadow:
-          '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
-      }}
-      className="flex relative flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
-    >
-      <div className="flex items-start flex-col w-full sm:w-auto">
-        <div className="flex items-center w-full">
-          <span
-            className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
-            style={{ fontSize: '70%' }}
+      <div id="forAmountScrollbar" className=" flex flex-col ">
+        {forAmounts.map((forAmount, index) => (
+          <div
+            key={index}
+            style={{
+              boxShadow:
+                '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
+            }}
+            className="flex relative flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
           >
-            FOR
-          </span>
-          <div className="relative">
-            <CiCircleInfo
-              color="white"
-              size={12}
-              onMouseEnter={() => setShowInfo1(true)}
-              onMouseLeave={() => setShowInfo1(false)}
-            />
-            {showInfo1 && (
-              <div className="absolute top-0 left-full bg-gray-950 bg-opacity-100 p-2 rounded shadow text-xs w-20 text-gray-500">
-                The Amount you are paying
+            <div className="flex items-start flex-col w-full sm:w-auto">
+              <div className="flex items-center w-full">
+                <span
+                  className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
+                  style={{ fontSize: '70%' }}
+                >
+                  FOR
+                </span>
+                <div className="relative">
+                  <CiCircleInfo
+                    color="white"
+                    size={12}
+                    onMouseEnter={() => setShowInfo1(true)}
+                    onMouseLeave={() => setShowInfo1(false)}
+                  />
+                  {showInfo1 && (
+                    <div className="absolute top-0 left-full bg-gray-950 bg-opacity-100 p-2 rounded shadow text-xs w-20 text-gray-500">
+                      The Amount you are paying
+                    </div>
+                  )}
+                </div>
+              </div>
+              <input
+                type="number"
+                value={forAmount.amount}
+                onChange={(e) => handleForAmountChange(index, e.target.value)}
+                inputMode="numeric"
+                placeholder="0.00"
+                className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
+              />
+            </div>
+
+            <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
+              <div className=" relative w-full sm:w-auto">
+                <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
+                  Balance <strong className="text-white">0 ETH</strong>
+                </span>
+                <div className="flex items-center gap-x-1">
+                  <button
+                    className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
+                    onClick={() => toggleDropdownAddedBox(index)}
+                  >
+                    {forAmount.token ? (
+                      <img
+                        src={forAmount.token.icon}
+                        alt={forAmount.token.name}
+                        className="w-4 h-4 mr-1"
+                      />
+                    ) : (
+                      'Select Token'
+                    )}
+                    <span className="text-sm">
+                      {forAmount.token?.name || ''}
+                    </span>
+                    <FiChevronDown color="#94a3b8" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {forAmount.isDropdownOpen && (
+              <div className="absolute right-1 top-20 z-[99999]  w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
+                <ul className="py-1">
+                  {chainOptions.map((chain, idx) => (
+                    <li key={idx}>
+                      <button
+                        className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
+                        onClick={() => handleTokenSelect(index, chain)}
+                      >
+                        <img
+                          src={chain.icon}
+                          alt={chain.name}
+                          className="w-6 h-6 mr-2"
+                        />
+                        {chain.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
-        </div>
-        <input
-          type="number"
-          value={forAmount.amount}
-          onChange={(e) => handleForAmountChange(index, e.target.value)}
-          inputMode="numeric"
-          placeholder="0.00"
-          className="bg-transparent pt-1 px-2 border-none outline-none text-white text-xl tracking-wide w-full sm:w-auto mt-2 sm:mt-0"
-        />
+        ))}
       </div>
 
-      <div className="flex items-end w-full sm:w-auto mt-2 sm:mt-0">
-        <div className=" relative w-full sm:w-auto">
-          <span className="text-[11px] text-nowrap text-gray-500 absolute right-2 -top-4">
-            Balance <strong className="text-white">0 ETH</strong>
-          </span>
-          <div className="flex items-center gap-x-1">
-            <button
-              className="flex items-center justify-between w-full px-2 py-1 text-white rounded-md border border-gray-700 focus:outline-none"
-              onClick={() => toggleDropdownAddedBox(index)}
-            >
-              {forAmount.token ? (
-                <img
-                  src={forAmount.token.icon}
-                  alt={forAmount.token.name}
-                  className="w-4 h-4 mr-1"
-                />
-              ) : (
-                'Select Token'
-              )}
-              <span className="text-sm">{forAmount.token?.name || ''}</span>
-              <FiChevronDown color="#94a3b8" />
-            </button>
-            
-          </div>
-        </div>
-       
-        
-      </div>
-
-        {forAmount.isDropdownOpen && (
-            <div className="absolute right-1 top-20 z-[99999]  w-full sm:w-40 custon-gray-bg rounded-md shadow-lg">
-              <ul className="py-1">
-                {chainOptions.map((chain, idx) => (
-                  <li key={idx}>
-                    <button
-                      className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                      onClick={() => handleTokenSelect(index, chain)}
-                    >
-                      <img
-                        src={chain.icon}
-                        alt={chain.name}
-                        className="w-6 h-6 mr-2"
-                      />
-                      {chain.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-      
-    </div>
-  ))
-}
-           
-
-     </div>
-
-     <button disabled={forAmounts.length===6}
-              onClick={addForAmount}
-              className="cursor-pointer rounded-[5px] mt-2 font-semibold bg-[#fec949] w-[99%] py-1 mx-auto text-black "
-            >
-              Add More Token
-            </button>
+      <button
+        disabled={forAmounts.length === 6}
+        onClick={addForAmount}
+        className="cursor-pointer rounded-[5px] mt-2 font-semibold bg-[#fec949] w-[99%] py-1 mx-auto text-black "
+      >
+        Add More Token
+      </button>
 
       <div className="flex flex-col items-start p-2 mt-2">
         <h1 className="text-gray-500 font-bold text-[13px]">FILL TYPE</h1>
-         <div onClick={()=>SetPartialFillChunkSize(2)}>
-        <div className="container">
-          <input
-            type="radio"
-            name="radio"
-            value="Partial Fill"
-            checked={selectedOption === 'Partial Fill'}
-            onChange={() => setSelectedOption('Partial Fill')}
-          />
-          <span className="checkmark"></span>
-          <span className="ms-7 text-white text-sm">Partial Fill</span>
+        <div onClick={() => SetPartialFillChunkSize(2)}>
+          <div className="container">
+            <input
+              type="radio"
+              name="radio"
+              value="Partial Fill"
+              checked={selectedOption === 'Partial Fill'}
+              onChange={() => setSelectedOption('Partial Fill')}
+            />
+            <span className="checkmark"></span>
+            <span className="ms-7 text-white text-sm">Partial Fill</span>
+          </div>
+          <p className="ms-7 text-sm text-gray-500">
+            Multiple Users can contribute to fulfill their offer
+          </p>
         </div>
-        <p className="ms-7 text-sm text-gray-500">
-          Multiple Users can contribute to fulfill their offer
-        </p>
-        </div>
-        {
-            selectedOption === "Partial Fill" &&  
-            <div className="flex relative w-full flex-col mt-6">
+        {selectedOption === 'Partial Fill' || PartialFillChunkSize >1 ?(
+          <div className="flex relative w-full flex-col mt-6">
             {/* Progress bar container */}
-            <div className='w-full z-50 h-5 relative flex items-center'>
-            <style>{`
+            <div className="w-full z-50 h-5 relative flex items-center">
+              <style>{`
         .progress-bar::after {
           content: '';
           position: absolute;
@@ -1005,38 +1077,43 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
           z-index: 999;
         }
       `}</style>
-            <div
-              className=" w-full h-[2px] bg-gray-300 bg-opacity-30 rounded-full progress-bar"
-              onClick={handleClick}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            >
-              {/* Filled part of the progress bar */}
-                
-      
-              {/* Circles for fixed breakpoints */}
-              
-      
-              {/* Tooltip for hover value */}
-              {tooltip && (
-                <div
-                  className="absolute -top-8 text-white bg-gray-800 p-1 rounded-md"
-                  style={{ left: `${tooltip.position}px`, transform: 'translateX(-50%)' }}
-                >
-                  {tooltip.chunkSize}
-                </div>
-              )}
-            </div>
+              <div
+                className=" w-full h-[2px] bg-gray-300 bg-opacity-30 rounded-full progress-bar"
+                onClick={handleClick}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
+                {/* Filled part of the progress bar */}
+
+                {/* Circles for fixed breakpoints */}
+
+                {/* Tooltip for hover value */}
+                {tooltip && (
+                  <div
+                    className="absolute -top-8 text-white bg-gray-800 p-1 rounded-md"
+                    style={{
+                      left: `${tooltip.position}px`,
+                      transform: 'translateX(-50%)',
+                    }}
+                  >
+                    {tooltip.chunkSize}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="absolute top-[1px]  left-0 bg-opacity-100 flex justify-between w-full">
-                {[2, 25, 50, 75, 100].map((value) => (
-                  <div
-                    key={value}
-                    className={`w-4 h-4 ${PartialFillChunkSize >= value ? 'bg-[#00e641]' : 'bg-slate-600 border-gray-400 bg-opacity-100'} cursor-pointer bg-opacity-100 rounded-full`}
-                  ></div>
-                ))}
-              </div>
-      
+              {[2, 25, 50, 75, 100].map((value) => (
+                <div
+                  key={value}
+                  className={`w-4 h-4 ${
+                    PartialFillChunkSize >= value
+                      ? 'bg-[#00e641]'
+                      : 'bg-slate-600 border-gray-400 bg-opacity-100'
+                  } cursor-pointer bg-opacity-100 rounded-full`}
+                ></div>
+              ))}
+            </div>
+
             {/* Labels below the progress bar */}
             <div className="flex justify-between mb-1 ms-1 text-gray-400">
               <p className="text-xs">2</p>
@@ -1046,69 +1123,83 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
               <p className="text-xs">100</p>
             </div>
           </div>
-          }
-        <div onClick={()=>SetPartialFillChunkSize(1)}>
-        <div className="container">
-          <input
-            type="radio"
-            name="radio"
-            value="Entire Fill"
-            checked={selectedOption === 'Entire Fill'}
-            onChange={() => setSelectedOption('Entire Fill')}
-          />
-          <span className="checkmark"></span>
-          <span className="ms-7 text-white text-sm">Entire Fill</span>
-        </div>
-        <p className="ms-7 text-sm text-gray-500">
-          Entire Offer must be filled by 1 user
-        </p>
+        ):""}
+        <div onClick={() => SetPartialFillChunkSize(1)}>
+          <div className="container">
+            <input
+              type="radio"
+              name="radio"
+              value="Entire Fill"
+              checked={selectedOption === 'Entire Fill'}
+              onChange={() => setSelectedOption('Entire Fill')}
+            />
+            <span className="checkmark"></span>
+            <span className="ms-7 text-white text-sm">Entire Fill</span>
+          </div>
+          <p className="ms-7 text-sm text-gray-500">
+            Entire Offer must be filled by 1 user
+          </p>
         </div>
 
-        <div >
-        <div className="container">
-          <input
-            type="radio"
-            name="radio"
-            value="Private Fill"
-            checked={selectedOption === 'Private Fill'}
-            onChange={() => setSelectedOption('Private Fill')}
-          />
-          <span className="checkmark"></span>
-          <span className="ms-7 text-white text-sm">Private Fill</span>
+        <div>
+          <div className="container">
+            <input
+              type="radio"
+              name="radio"
+              value="Private Fill"
+              checked={selectedOption === 'Private Fill'}
+              onChange={() => setSelectedOption('Private Fill')}
+            />
+            <span className="checkmark"></span>
+            <span className="ms-7 text-white text-sm">Private Fill</span>
+          </div>
+          <p className="ms-7 text-sm text-gray-500 w-[80%]">
+            Offer can only be filled by whitelisted user
+          </p>
         </div>
-        <p className="ms-7 text-sm text-gray-500 w-[80%]">
-          Offer can only be filled by whitelisted user
-        </p>
-        </div>
-        {
-            selectedOption === 'Private Fill' && <div className='w-full mt-6 p-4 bg-[#15161B] rounded-lg shadow-md'>
-            <div className='flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0'>
+        {selectedOption === 'Private Fill' && (
+          <div className="w-full mt-6 p-4 bg-[#15161B] rounded-lg shadow-md">
+            <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
               <input
                 type="text"
                 name="text"
                 value={todoAddAddress}
                 onChange={(e) => setTodoAddAddress(e.target.value)}
-                className='w-full sm:w-2/3 p-2 border border-gray-700 bg-gray-800 text-white rounded-md outline-none'
-                placeholder='Enter your address...'
+                className="w-full sm:w-2/3 p-2 border border-gray-700 bg-gray-800 text-white rounded-md outline-none"
+                placeholder="Enter Address..."
               />
               <button
                 onClick={AddTodoAddressFunction}
-                className='mt-2 sm:mt-0 w-full sm:w-auto py-2 px-2 bg-[#fec949] text-black font-semibold rounded-md hover:bg-[#fce042] transition duration-300'
+                className="mt-2 sm:mt-0 w-full sm:w-auto py-2 px-2 bg-[#fec949] text-black font-semibold rounded-md hover:bg-[#fce042] transition duration-300"
               >
                 Add Address
               </button>
             </div>
-            <div id='forAmountScrollbar' className='mt-4 max-h-[120px] overflow-y-auto'>
-              {
-                todoAddressData && todoAddressData.map((val, ind) => (
-                  <div key={ind} className='p-2 mb-2 bg-gray-800 text-white rounded-md shadow-md'>
+            <div style={{marginTop: "14px"}} className="container flex items-center gap-2 mt-2  text-sm">
+            <input
+              type="checkbox"
+              name="checkbox"
+              checked={ischecked} onChange={(e)=>handlechecked(e)}
+            />
+            <span className="checkmark"></span>
+            <span className="ms-7 text-white text-sm mt-1">Include Yourself</span>
+          </div>
+             <div
+              id="forAmountScrollbar"
+              className="mt-4 max-h-[120px] overflow-y-auto"
+            >
+              {todoAddressData &&
+                todoAddressData.map((val, ind) => (
+                  <div
+                    key={ind}
+                    className="p-2 mb-2 bg-gray-800 text-white rounded-md shadow-md"
+                  >
                     <p>{val}</p>
                   </div>
-                ))
-              }
+                ))}
             </div>
           </div>
-          }
+        )}
       </div>
 
       {/* <div className="grid grid-cols-2 gap-1 md:grid-cols-3 md:gap-x-2 md:gap-y-2"></div>
@@ -1122,11 +1213,6 @@ const [forAmounts, setForAmounts] = useState([{ amount: '', token: null, isDropd
     </div>
   );
 };
-
-
-
-
-
 
 const Card3 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

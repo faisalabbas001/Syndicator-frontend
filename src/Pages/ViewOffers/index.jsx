@@ -7,7 +7,7 @@ import { abi, contractAddress } from '../../BlockChainContext/helper';
 import { config } from '../../BlockChainContext/config';
 
 const Home =() => {
-  const [TokenData, setTokenData] = useState([]);
+  // const [TokenData, setTokenData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [numberOfOffers, setNumberOfOffers] = useState();
 const [data,setdata] = useState([]);
