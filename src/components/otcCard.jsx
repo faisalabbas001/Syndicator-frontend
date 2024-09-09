@@ -12,10 +12,10 @@ const OTCcard = ({data}) => {
     requested_assets:forAmount,
     // forTokenImage,
     forTotalValue,
-    name,
+    // name,
     pricePerToken,
     progressPercentage,
-    partialFull,
+    // partialFull,
     amount:sellingAmount,
     // timeAgo,
     // tokenImage
@@ -33,13 +33,13 @@ const OTCcard = ({data}) => {
               />
             </div>
             <div className="ps-3">
-              <h3 className="text-white text-2xl">{name}</h3>
+              <h3 className="text-white text-2xl">{"Bonk"}</h3>
               <div className=" flex flex-wrap gap-x-1 sm:gap-y-1">
               <span className="text-gray-500 text-xs rounded-md p-1 custon-gray-bg">
-                {contractAddress.asset_address}
+                {contractAddress.asset_address.slice(0, 4) + "..." + contractAddress.asset_address.slice(-4)}
               </span>
               <span className="text-gray-500 text-xs  rounded-md p-1 custon-gray-bg">
-                {partialFull}
+                {"Partial Full"}
               </span>
               </div>
             </div>
@@ -97,7 +97,7 @@ const OTCcard = ({data}) => {
                   />
                 </div>
               </div>
-              <span className=" custom-gray">${pricePerToken}/Token</span>
+              <span className=" custom-gray">${"400"}/Token</span>
             </div>
           </span>
           <span>
@@ -128,7 +128,7 @@ const OTCcard = ({data}) => {
         <div className="border-t border-gray-800 flex justify-between items-center px-6 my-0 py-2 ">
           <span className=" custom-gray ">8m ago</span>
           <span className="">
-            <Link to={`token-sale/${name}`} state={data} className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
+            <Link to={`token-sale/bonk`} state={data} className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
               <span>Buy</span>
               <GoArrowRight className="ml-2" size={20} />
             </Link>
