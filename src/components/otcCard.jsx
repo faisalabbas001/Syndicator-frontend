@@ -118,10 +118,7 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
               <span className=" custom-gray font-bold text-sm ">SELLING</span>
               <div className="flex items-center mt-1">
                 <span className="text-xl me-1 text-gray-300">
-                  {sellingAmount.toString() ===
-                  contractAddress.chunk_size.toString()
-                    ? sellingAmount.toString()
-                    : formater(sellingAmount)}
+                  {formater(sellingAmount)}
                 </span>{" "}
                 <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img

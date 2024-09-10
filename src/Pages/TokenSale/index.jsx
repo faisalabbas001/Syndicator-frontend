@@ -62,7 +62,7 @@ const TokenSale = () => {
     const formattedAmount = Number(formater(stateData.amount));
     console.log("formattedChunkSize:", formattedChunkSize);
     console.log("formattedAmount:", formattedAmount);
-    console.log("PartialFillChunkSize:", PartialFillChunkSize);
+    // console.log("PartialFillChunkSize:", PartialFillChunkSize);
   
     const calculatedBuyingValue = (formattedAmount * PartialFillChunkSize) / 100;
     console.log("calculatedBuyingValue:", calculatedBuyingValue);
