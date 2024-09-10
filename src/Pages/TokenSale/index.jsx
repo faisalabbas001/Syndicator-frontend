@@ -58,14 +58,23 @@ const TokenSale = () => {
   console.log("stateData", stateData);
 
   useEffect(() => {
-    // Ensure the formater function returns a number or convert the result to a number
     const formattedChunkSize = Number(formater(stateData.selectedChain.chunk_size));
     const formattedAmount = Number(formater(stateData.amount));
+    console.log("formattedChunkSize:", formattedChunkSize);
+    console.log("formattedAmount:", formattedAmount);
+    console.log("PartialFillChunkSize:", PartialFillChunkSize);
   
-    // Perform the calculations and update the state
-    SetForValue((formattedChunkSize * PartialFillChunkSize) / 100);
-    SetBuyingValue((formattedAmount * PartialFillChunkSize) / 100);
+    const calculatedBuyingValue = (formattedAmount * PartialFillChunkSize) / 100;
+    console.log("calculatedBuyingValue:", calculatedBuyingValue);
+    
+    const fullBuyingValue = calculatedBuyingValue.toString();
+    const calculatedForValue = (formattedChunkSize * PartialFillChunkSize) / 100;
+    const fullForValue = calculatedForValue.toString();
+  
+    SetBuyingValue(fullBuyingValue); 
+    SetForValue(fullForValue);
   }, [PartialFillChunkSize, stateData.amount, stateData.requested_assets]);
+  
 
   return (
     <div className="bg-transparent text-white p-1 py-3 sm:p-6 min-h-screen flex flex-col lg:flex-row justify-between gap-3 sm:gap-9 ">
