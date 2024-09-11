@@ -158,7 +158,7 @@ const OfferMarketCard = () => {
             args: [
               equivalent_asset[0],
               NoOfChunks,
-              OfferAmount1,
+              parseEther(OfferAmount1),
               offeraddress1,
             ],
           });
@@ -208,7 +208,7 @@ const OfferMarketCard = () => {
             abi: abi,
             address: contractAddress,
             functionName: 'create_multi_token_offer',
-            args: [equivalent_asset, NoOfChunks, OfferAmount1, offeraddress1],
+            args: [equivalent_asset, NoOfChunks, parseEther(OfferAmount1), offeraddress1],
           });
 
           const hash = await writeContract(config, request);
@@ -690,6 +690,11 @@ const Card2 = () => {
       name: 'ETH',
       icon: '/assets/images/Ethereum_logo.png',
       address: '0x0000000000000000000000000000000000000000',
+    },
+    {
+      name: 'ABD',
+      icon: '/tokenImages/token3.png',
+      address: '0x2421f82ABfEe7C620C01B828a7B2E7141672c612',
     },{
       name: 'syn-test',
       icon: '/assets/images/Ethereum_logo.png',

@@ -1214,3 +1214,4 @@ export const erc20Abi = [
 	},
   ];
 export const testTokenAddress="0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f";
+export const zeroAddress='0x0000000000000000000000000000000000000000';

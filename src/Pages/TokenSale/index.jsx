@@ -1,17 +1,33 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // import { FaBitcoin, FaEthereum } from 'react-icons/fa';
-import { FiExternalLink, FiArrowRight, FiArrowDown } from "react-icons/fi";
-import { FiGlobe, FiX, FiSend } from "react-icons/fi";
-import { formater } from "../../BlockChainContext/helper";
+import { FiExternalLink, FiArrowRight, FiArrowDown } from 'react-icons/fi';
+import { FiGlobe, FiX, FiSend } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import {
+  formater,
+  abi,
+  contractAddress,
+  testTokenAddress,
+  erc20Abi,
+  zeroAddress,
+} from '../../BlockChainContext/helper';
 import {
   getTokenImage,
   getTokenSymbol,
   getTokenName,
   // checkFill
-} from "../../utils/ReuseFuntions";
-import { useEffect, useState } from "react";
+} from '../../utils/ReuseFuntions';
+import { useEffect, useState } from 'react';
+import { nonceManager, parseEther } from 'viem';
+import {
+  simulateContract,
+  writeContract,
+  waitForTransactionReceipt,
+} from '@wagmi/core';
+// import { abi, contractAddress,erc20Abi,testTokenAddress } from '../../BlockChainContext/helper';
+import { config } from '../../BlockChainContext/config';
 
 const TokenSale = () => {
   const location = useLocation();
@@ -19,10 +35,10 @@ const TokenSale = () => {
   const [tooltip, setTooltip] = useState(null);
   const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(1);
   const [BuyingValue, SetBuyingValue] = useState(formater(stateData.amount));
-  const [ForValue, SetForValue] = useState(formater(stateData.requested_assets[0].chunk_size));
+  const [ForValue, SetForValue] = useState(
+    formater(stateData.requested_assets[0].chunk_size)
+  );
   const Navigate = useNavigate();
-
-
 
   // Function to handle hover for tooltip
   const handleClick = (e) => {
@@ -30,7 +46,9 @@ const TokenSale = () => {
     // console.log(bar)
     const clickPosition = e.clientX - bar.left;
     const barWidth = bar.width;
-    const newChunkSize = Math.round((clickPosition / barWidth) * stateData.CalculatedChunkSize);
+    const newChunkSize = Math.round(
+      (clickPosition / barWidth) * stateData.calculatedChunkSize
+    );
     SetPartialFillChunkSize(newChunkSize <= 1 ? 1 : newChunkSize);
   };
 
@@ -39,7 +57,9 @@ const TokenSale = () => {
     const bar = e.target.getBoundingClientRect();
     const hoverPosition = e.clientX - bar.left;
     const barWidth = bar.width;
-    const hoverChunkSize = Math.round((hoverPosition / barWidth) * stateData.CalculatedChunkSize);
+    const hoverChunkSize = Math.round(
+      (hoverPosition / barWidth) * stateData.calculatedChunkSize
+    );
     setTooltip({
       position: hoverPosition,
       chunkSize: hoverChunkSize <= 1 ? 1 : hoverChunkSize,
@@ -48,33 +68,180 @@ const TokenSale = () => {
 
   const handleMouseLeave = () => setTooltip(null);
   console.log(PartialFillChunkSize);
-  console.log("stateData", stateData);
+  console.log('stateData', stateData);
 
   const progressPercentage = 43;
 
   if (stateData && stateData.requested_assets.length === 1) {
-    stateData.selectedChain = stateData.requested_assets[0];
+    stateData.selectedChain = {...stateData.requested_assets[0],offerId:0} ;
   }
-  console.log("stateData", stateData);
+  console.log('stateData', stateData);
 
   useEffect(() => {
-    const formattedChunkSize = Number(formater(stateData.selectedChain.chunk_size));
+    const formattedChunkSize = Number(
+      formater(stateData.selectedChain.chunk_size)
+    );
     const formattedAmount = Number(formater(stateData.amount));
-    console.log("formattedChunkSize:", formattedChunkSize);
-    console.log("formattedAmount:", formattedAmount);
+    console.log('formattedChunkSize:', formattedChunkSize);
+    console.log('formattedAmount:', formattedAmount);
     // console.log("PartialFillChunkSize:", PartialFillChunkSize);
-  
-    const calculatedBuyingValue = (formattedAmount * PartialFillChunkSize) / 100;
-    console.log("calculatedBuyingValue:", calculatedBuyingValue);
-    
+
+    const calculatedBuyingValue =
+      (formattedAmount / stateData.calculatedChunkSize)*PartialFillChunkSize;
+    console.log('calculatedBuyingValue:', calculatedBuyingValue);
+
     const fullBuyingValue = calculatedBuyingValue.toString();
-    const calculatedForValue = (formattedChunkSize * PartialFillChunkSize) / 100;
+    const calculatedForValue =
+      Number(formater(stateData.selectedChain.chunk_size)) * PartialFillChunkSize;
     const fullForValue = calculatedForValue.toString();
-  
-    SetBuyingValue(fullBuyingValue); 
+
+    SetBuyingValue(fullBuyingValue);
     SetForValue(fullForValue);
   }, [PartialFillChunkSize, stateData.amount, stateData.requested_assets]);
-  
+
+  const tokenApproval = async (value) => {
+    try {
+      const { request } = await simulateContract(config, {
+        abi: erc20Abi,
+        address: testTokenAddress,
+        functionName: 'approve',
+        //cook totalPrice
+        args: [contractAddress, value.includes(".hello") ? value.split(".hello")[0] : parseEther(value)],
+      });
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log('token Aapproved');
+      toast.success('Token Approved');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const AMOWT = async () => {
+    try {
+      console.log("AMOWT")
+      await tokenApproval(`${stateData.requested_assets[0].chunk_size}.hello`);
+      const { request } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: 'accept_multi_offer_with_tokens',
+        args: [
+          stateData.offerId,
+          stateData.selectedChain.indexToAccept,
+          stateData.selectedChain.asset_address,
+          parseEther(stateData.requested_assets[stateData.selectedChain.indexToAccept].chunk_size),
+        ],
+      });
+
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log('hash for AMOWT ' + transactionReceipt);
+      toast.success('TRANSACTION COMPLETE');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const AMOWC = async () => {
+    try {
+      console.log("AMOWC")
+      const { request } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: 'accept_multi_offer_with_coins',
+        args: [stateData.offerId, stateData.selectedChain.indexToAccept],
+        value: stateData.requested_assets[0].chunk_size,
+      });
+
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log('hash for AMOWT ' + transactionReceipt);
+      toast.success('TRANSACTION COMPLETE');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const ASOWT = async () => {
+    try {
+      console.log("ASOWT")
+      await tokenApproval(`${(Number(formater(stateData.requested_assets[0].chunk_size)))*PartialFillChunkSize}`);
+      const { request } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: 'accept_single_offer_with_tokens',
+        args: [stateData.offerId, stateData.requested_assets[0].chunk_size],
+      });
+
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log('hash for AMOWT ' + transactionReceipt);
+      toast.success('TRANSACTION COMPLETE');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const ASOWC = async () => {
+    try {
+      console.log("ASOWC")
+      console.log("saaasxa"+stateData.requested_assets[0].chunk_size);
+      console.log(stateData.offerId);
+      const { request } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: 'accept_single_offer_with_coins',
+        args: [stateData.offerId],
+        value: stateData.requested_assets[0].chunk_size,
+      });
+
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log('hash for AMOWT ' + transactionReceipt);
+      toast.success('TRANSACTION COMPLETE');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOrder = async () => {
+    try {
+      if (stateData.isMultiToken) {
+        if (stateData.isEthereum) {
+          await AMOWT();
+        } else if (!stateData.isEthereum) {
+          if (stateData.selectedChain.asset_address == zeroAddress) {
+            await AMOWC();
+          } else {
+            await AMOWT();
+          }
+        }
+      } else {
+        if (stateData.isEthereum) {
+          await ASOWT();
+        } else if (!stateData.isEthereum) {
+          if (stateData.selectedChain.asset_address == zeroAddress) {
+            await ASOWC();
+          } else {
+            await ASOWT();
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="bg-transparent text-white p-1 py-3 sm:p-6 min-h-screen flex flex-col lg:flex-row justify-between gap-3 sm:gap-9 ">
@@ -99,8 +266,8 @@ const TokenSale = () => {
                   {/* PARTIAL FILL */}
                   {stateData.amount.toString() ===
                   stateData.owned_asset.chunk_size.toString()
-                    ? "Entire Fill"
-                    : "Partial Fill"}
+                    ? 'Entire Fill'
+                    : 'Partial Fill'}
                 </p>
               </div>
               {/* circle  */}
@@ -156,22 +323,22 @@ const TokenSale = () => {
             <div className=" flex justify-between items-center mb-1">
               <p className="mb-1 text-stone-300 font-semibold">Token Name: </p>
               <span className=" ms-auto text-gray-400">
-                {" "}
+                {' '}
                 {getTokenName(stateData.owned_asset.asset_address)}
               </span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Token Symbol:{" "}
+                Token Symbol:{' '}
               </p>
               <span className=" ms-auto text-gray-400">
-                {" "}
+                {' '}
                 {getTokenSymbol(stateData.owned_asset.asset_address)}
               </span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Token Contract:{" "}
+                Token Contract:{' '}
               </p>
               <span className=" ms-auto text-gray-400 inline-flex">
                 {stateData.owned_asset.asset_address.slice(0, 7)}....
@@ -189,10 +356,10 @@ const TokenSale = () => {
           </div>
           <div className="flex justify-between px-0 sm:px-3 ">
             <p className="font-semibold inline-flex items-center">
-              {formater(stateData.amount)}{" "}
-              {getTokenSymbol(stateData.owned_asset.asset_address)}{" "}
+              {formater(stateData.amount)}{' '}
+              {getTokenSymbol(stateData.owned_asset.asset_address)}{' '}
               <span>
-                {" "}
+                {' '}
                 <img
                   height={15}
                   width={15}
@@ -202,10 +369,10 @@ const TokenSale = () => {
               </span>
             </p>
             <p className="font-semibold inline-flex items-center">
-              {formater(stateData.selectedChain.chunk_size)}{" "}
-              {getTokenSymbol(stateData.selectedChain.asset_address)}{" "}
+              {formater(stateData.selectedChain.chunk_size)}{' '}
+              {getTokenSymbol(stateData.selectedChain.asset_address)}{' '}
               <span>
-                {" "}
+                {' '}
                 <img
                   height={20}
                   width={20}
@@ -232,7 +399,7 @@ const TokenSale = () => {
           <div className="text-sm px-0 sm:px-3 pt-1">
             <div className=" flex justify-between items-center mb-1">
               <p className="mb-1 text-stone-300 font-semibold">
-                Remaining Tokens:{" "}
+                Remaining Tokens:{' '}
               </p>
               <span className=" ms-auto text-gray-400">60,000,000 M7</span>
             </div>
@@ -246,31 +413,34 @@ const TokenSale = () => {
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Offer Price/Token:{" "}
+                Offer Price/Token:{' '}
               </p>
               <span className=" ms-auto text-gray-400">0.000055 ETH</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Market Price/Token:{" "}
+                Market Price/Token:{' '}
               </p>
               <span className=" ms-auto text-gray-400">0.0001 ETH</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Price Difference:{" "}
+                Price Difference:{' '}
               </p>
               <span className=" ms-auto text-red-600">10% ABOVE MARKET</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
-                Minimum Fill:{" "}
+                Minimum Fill:{' '}
               </p>
               <span className=" ms-auto text-gray-400">1 M7</span>
             </div>
           </div>
         </div>
-        <button onClick={()=>Navigate("/")}  className="bg-gray-500 opacity-75 w-full py-2 rounded-lg rounded-t-none">
+        <button
+          onClick={() => Navigate('/')}
+          className="bg-gray-500 opacity-75 w-full py-2 rounded-lg rounded-t-none"
+        >
           Back
         </button>
       </div>
@@ -287,8 +457,8 @@ const TokenSale = () => {
               alt=" icon logo"
             />
             <h2 className="text-lg font-semibold ms-0 sm:ms-1 ">
-              {" "}
-              {getTokenSymbol(stateData.owned_asset.asset_address)} /{" "}
+              {' '}
+              {getTokenSymbol(stateData.owned_asset.asset_address)} /{' '}
               {getTokenSymbol(stateData.selectedChain.asset_address)}
             </h2>
           </div>
@@ -301,20 +471,20 @@ const TokenSale = () => {
           <div className=" relative">
             <div className="bg-black bg-opacity-45 rounded-lg rounded-b-none mb-[1px]">
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between">
-                {" "}
+                {' '}
                 <p className=" text-blue-500 text-xs font-semibold">
                   BUYING
-                </p>{" "}
+                </p>{' '}
                 <p className=" text-gray-400  text-xs">
-                  <span className=" text-[11px]">MAX</span>{" "}
+                  <span className=" text-[11px]">MAX</span>{' '}
                   <strong className=" ms-1 text-white"> 800,000,0</strong>
                 </p>
               </div>
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between pb-7">
-                {" "}
+                {' '}
                 <p className="text-xl font-semibold text-stone-300">
                   {BuyingValue}
-                </p>{" "}
+                </p>{' '}
                 <p className=" text-gray-400  text-xs">
                   <img
                     height={25}
@@ -328,18 +498,18 @@ const TokenSale = () => {
             </div>
             <div className="bg-black bg-opacity-45 rounded-lg rounded-t-none ">
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between">
-                {" "}
-                <p className=" text-blue-500 text-xs font-semibold">FOR</p>{" "}
+                {' '}
+                <p className=" text-blue-500 text-xs font-semibold">FOR</p>{' '}
                 <p className=" text-gray-400  text-xs">
-                  <span className=" text-[11px]">BALANCE</span>{" "}
+                  <span className=" text-[11px]">BALANCE</span>{' '}
                   <strong className=" ms-1 text-white"> 1.2345</strong>
                 </p>
               </div>
               <div className=" flex pt-2 px-2  sm:px-6 items-center justify-between pb-7">
-                {" "}
+                {' '}
                 <p className="text-xl font-semibold text-stone-300">
                   {ForValue}
-                </p>{" "}
+                </p>{' '}
                 <p className=" text-gray-400  text-xs">
                   <img
                     height={25}
@@ -368,7 +538,11 @@ const TokenSale = () => {
           height: 2px;
           background-color: #00e641;
           border-radius: 999px;
-          width: ${Math.floor(PartialFillChunkSize/stateData.CalculatedChunkSize*100)}%;
+
+          
+          width: ${Math.floor(
+            (PartialFillChunkSize / stateData.calculatedChunkSize) * 100
+          )}%;
           z-index: 999;
         }
       `}</style>
@@ -397,7 +571,7 @@ const TokenSale = () => {
               </div>
             </div>
             <div className="absolute top-[1px]  left-0 bg-opacity-100 flex justify-between w-full">
-              {[1,  stateData.CalculatedChunkSize].map((value) => (
+              {[1, stateData.calculatedChunkSize].map((value) => (
                 <div
                   key={value}
                   className={`w-4 h-4 ${
@@ -412,13 +586,16 @@ const TokenSale = () => {
             {/* Labels below the progress bar */}
             <div className="flex justify-between mb-1 ms-1 text-gray-400">
               <p className="text-xs">1</p>
-              
-              <p className="text-xs">{stateData.CalculatedChunkSize}</p>
+
+              <p className="text-xs">{stateData.calculatedChunkSize}</p>
             </div>
           </div>
           {/* End of progress bar */}
         </div>
-        <button className="bg-blue-500 w-full py-3 mb-3 font-semibold rounded-lg text-stone-100 rounded-t-none">
+        <button
+          onClick={handleOrder}
+          className="bg-blue-500 w-full py-3 mb-3 font-semibold rounded-lg text-stone-100 rounded-t-none"
+        >
           Execute Order
         </button>
         <h3 className="bg-opacity-30 bg-[#5e5d5d] text-white w-full p-2 sm:p-3 font-bold rounded-lg rounded-b-none shadow-md mb-[1px]">

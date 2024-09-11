@@ -1,18 +1,25 @@
 /* eslint-disable react/prop-types */
-import { GoArrowRight } from "react-icons/go";
+import { GoArrowRight } from 'react-icons/go';
 // import{ethers}from 'ethers';
 
-import "../styles/otcCard.css";
-import { Link } from "react-router-dom";
-import { formater } from "../BlockChainContext/helper";
-import { FiChevronDown } from "react-icons/fi";
-import { useState } from "react";
-import { getTokenImage, getTokenName } from "../utils/ReuseFuntions";
-const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
+import '../styles/otcCard.css';
+import { Link } from 'react-router-dom';
+import { formater } from '../BlockChainContext/helper';
+import { FiChevronDown } from 'react-icons/fi';
+import { useState } from 'react';
+import { getTokenImage, getTokenName } from '../utils/ReuseFuntions';
+const OTCcard = ({
+  data,
+  offerId,
+  isMultiToken,
+  isEthereum,
+  calculatedChunkSize,
+}) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState({
-    chunk_size: "",
-    asset_address: "",
+    chunk_size: '',
+    asset_address: '',
+    indexToAccept: 0,
   });
 
   console.log(data);
@@ -61,14 +68,14 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
               <div className=" flex flex-wrap gap-x-1 sm:gap-y-1">
                 <span className="text-gray-500 text-xs rounded-md p-1 custon-gray-bg">
                   {contractAddress.asset_address.slice(0, 4) +
-                    "..." +
+                    '...' +
                     contractAddress.asset_address.slice(-4)}
                 </span>
                 <span className="text-gray-500 text-xs  rounded-md p-1 custon-gray-bg">
                   {sellingAmount.toString() ===
                   contractAddress.chunk_size.toString()
-                    ? "Entire Fill"
-                    : "Partial Fill"}
+                    ? 'Entire Fill'
+                    : 'Partial Fill'}
                 </span>
               </div>
             </div>
@@ -113,13 +120,13 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
         {/* second row */}
         <div className="flex justify-between items-center py-1">
           <span>
-            {" "}
+            {' '}
             <div className="flex flex-col px-5">
               <span className=" custom-gray font-bold text-sm ">SELLING</span>
               <div className="flex items-center mt-1">
                 <span className="text-xl me-1 text-gray-300">
                   {formater(sellingAmount)}
-                </span>{" "}
+                </span>{' '}
                 <div className="w-5 h-auto overflow-hidden rounded-full">
                   <img
                     src={getTokenImage(contractAddress.asset_address)}
@@ -128,7 +135,7 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
                   />
                 </div>
               </div>
-              <span className=" custom-gray">${"NAN"}/Token</span>
+              <span className=" custom-gray">${'NAN'}/Token</span>
             </div>
           </span>
           <span>
@@ -136,7 +143,7 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
           </span>
 
           <span>
-            {" "}
+            {' '}
             <div className="flex flex-col ps-auto pe-6 ">
               <span className=" custom-gray font-bold text-sm text-right ">
                 FOR
@@ -152,16 +159,16 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
                       {selectedChain.chunk_size.toString() ? (
                         <img
                           src={getTokenImage(selectedChain.asset_address)}
-                          alt={"Solana"}
+                          alt={'Solana'}
                           className="w-5 h-5 rounded-full mr-1"
                         />
                       ) : (
-                        "Select Token"
+                        'Select Token'
                       )}
                       <span className="text-sm">
                         {selectedChain.chunk_size.toString()
                           ? formater(selectedChain.chunk_size)
-                          : ""}
+                          : ''}
                       </span>
                       <FiChevronDown color="#94a3b8" />
                     </button>
@@ -172,11 +179,11 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
                             <li key={index}>
                               <button
                                 className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                                onClick={() => handleChainSelect(chain)}
+                                onClick={() => handleChainSelect({...chain,index})}
                               >
                                 <img
                                   src={getTokenImage(chain.asset_address)}
-                                  alt={"token-img"}
+                                  alt={'token-img'}
                                   className="w-6 rounded-full h-6 mr-2"
                                 />
                                 {formater(chain.chunk_size)}
@@ -189,17 +196,17 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
                   </div>
                 ) : (
                   <div className="flex items-center">
-                    {" "}
+                    {' '}
                     <img
                       src={getTokenImage(forAmount[0].asset_address)}
-                      alt={"Solana"}
+                      alt={'Solana'}
                       className="w-5 rounded-full h-5 mr-1"
                     />
                     {formater(forAmount[0].chunk_size)}
                   </div>
                 )}
               </div>
-              <span className=" custom-gray text-right">${"NAN"}</span>
+              <span className=" custom-gray text-right">${'NAN'}</span>
             </div>
           </span>
         </div>
@@ -209,7 +216,14 @@ const OTCcard = ({ data,ind,ismultitoken,isEthereum, CalculatedChunkSize}) => {
           <span className="">
             <Link
               to={`token-sale/bonk`}
-              state={{ ...data, selectedChain,ind,ismultitoken,isEthereum,CalculatedChunkSize }}
+              state={{
+                ...data,
+                selectedChain,
+                offerId,
+                isMultiToken,
+                isEthereum,
+                calculatedChunkSize,
+              }}
               className=" bg-gray-600 bg-opacity-35 custom-gray font-bold py-2 px-4 rounded-md flex items-center transition duration-300 ease-in-out hover:bg-green-700 hover:text-white"
             >
               <span>Buy</span>
