@@ -4,14 +4,17 @@ import OTCcard from '../../components/otcCard';
 import HorizontalToolbar from '../../components/toolbar';
 import Loader from '../Loader';
 import { readContract } from '@wagmi/core';
-import { abi, contractAddress, zeroAddress } from '../../BlockChainContext/helper';
+import { abi, contractAddress, formater, zeroAddress } from '../../BlockChainContext/helper';
 import { config } from '../../BlockChainContext/config';
+import { useHeaderData } from '../../HeaderContext';
+import { getTokenName } from '../../utils/ReuseFuntions';
 
 const Home = () => {
   // const [TokenData, setTokenData] = useState([]);
   const [loading, setLoading] = useState(true); // Set initial loading state to true
   const [numberOfOffers, setNumberOfOffers] = useState(null); // Initialize with null
   const [data, setData] = useState([]);
+  const { filterByAmount, setFilterbyamount, callTheFunction, setCallTheFunction,filterByTokenName,setFilterByTokenName} = useHeaderData();
   let offersData = [];
 
  
@@ -52,12 +55,42 @@ const Home = () => {
     getNumberOfOffer();
   }, []);
 
+
+  // Sort data by amount
+  useEffect(() => {
+    if (filterByAmount) {
+      const sortedData = [...data].sort((a, b) => {
+        // Sort based on 'amount'
+        return filterByAmount === "asc"
+          ? Number(formater(a.amount)) - Number(formater(b.amount)) // Ascending order
+          : Number(formater(b.amount)) - Number(formater(a.amount)); // Descending order
+      });
+  
+      setData(sortedData);
+      setFilterbyamount(null); // Reset filter state after sorting
+    }
+  }, [filterByAmount, data]);
+
+  // Fetch data from blockchain
   useEffect(() => {
     if (numberOfOffers !== null) {
       getOffers();
     }
   }, [numberOfOffers]);
 
+   // Filter by token name
+
+  useEffect(() => {
+    if (callTheFunction && filterByTokenName) {
+      const filteredData = data.filter((val) => {
+        return getTokenName(val.owned_asset.asset_address).toLowerCase().includes(filterByTokenName.toLowerCase());
+      });
+       console.log(filteredData)
+      setData(filteredData);
+      setCallTheFunction(false);
+      setFilterByTokenName("") // Reset to false after filtering
+    }
+  }, [callTheFunction, filterByTokenName, data]);
   return (
     <>
       <div className="px-5 md:px-1 pt-5">

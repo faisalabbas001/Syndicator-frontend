@@ -1,45 +1,53 @@
-import { AiOutlineArrowDown } from 'react-icons/ai';
-import { BiShapePolygon } from 'react-icons/bi';
-import { DiDocker } from 'react-icons/di';
-import { TbDropCircle } from 'react-icons/tb';
-import { FaGgCircle } from 'react-icons/fa';
-import { FcDoughnutChart } from 'react-icons/fc';
-import { AiOutlineBold } from 'react-icons/ai';
-import { FcScatterPlot } from 'react-icons/fc';
-import { AiFillMediumSquare } from 'react-icons/ai';
-import { TbCurrencySolana } from 'react-icons/tb';
-import { FaScroll } from 'react-icons/fa';
-import { FaAirbnb } from 'react-icons/fa';
-import { BiBitcoin } from 'react-icons/bi';
-import { BsPCircle } from 'react-icons/bs';
-import { TbArrowZigZag } from 'react-icons/tb';
-import { useState } from 'react';
-import { FaEthereum } from 'react-icons/fa';
-import 'react-step-progress-bar/styles.css';
+import { AiOutlineArrowDown } from "react-icons/ai";
+import { BiShapePolygon } from "react-icons/bi";
+import { DiDocker } from "react-icons/di";
+import { TbDropCircle } from "react-icons/tb";
+import { FaGgCircle } from "react-icons/fa";
+import { FcDoughnutChart } from "react-icons/fc";
+import { AiOutlineBold } from "react-icons/ai";
+import { FcScatterPlot } from "react-icons/fc";
+import { AiFillMediumSquare } from "react-icons/ai";
+import { TbCurrencySolana } from "react-icons/tb";
+import { FaScroll } from "react-icons/fa";
+import { FaAirbnb } from "react-icons/fa";
+import { BiBitcoin } from "react-icons/bi";
+import { BsPCircle } from "react-icons/bs";
+import { TbArrowZigZag } from "react-icons/tb";
+import { useState } from "react";
+import { FaEthereum } from "react-icons/fa";
+import "react-step-progress-bar/styles.css";
 // import { ProgressBar, Step } from "react-step-progress-bar";
 // import { GoCheckCircleFill } from "react-icons/go";
-import { FiChevronDown } from 'react-icons/fi';
-import { CiCircleInfo } from 'react-icons/ci';
-import { FaLockOpen, FaScaleBalanced } from 'react-icons/fa6';
-import '../styles/otcCard.css';
-import DeactivateModal from './Popup';
+import { FiChevronDown } from "react-icons/fi";
+import { CiCircleInfo } from "react-icons/ci";
+import { FaLockOpen, FaScaleBalanced } from "react-icons/fa6";
+import "../styles/otcCard.css";
+import DeactivateModal from "./Popup";
 import {
   simulateContract,
   writeContract,
   waitForTransactionReceipt,
-} from '@wagmi/core';
-import { ethers } from 'ethers';
-import { abi, contractAddress,erc20Abi,testTokenAddress } from '../BlockChainContext/helper';
-import { nonceManager, parseEther } from 'viem';
-import { config } from '../BlockChainContext/config';
-import toast from 'react-hot-toast';
+} from "@wagmi/core";
+import { ethers } from "ethers";
+import {
+  abi,
+  contractAddress,
+  erc20Abi,
+  testTokenAddress,
+} from "../BlockChainContext/helper";
+import { nonceManager, parseEther } from "viem";
+import { config } from "../BlockChainContext/config";
+import toast from "react-hot-toast";
+import { getTokenImage, getTokenSymbol } from "../utils/ReuseFuntions";
 let equivalent_asset;
 let OfferAmount1;
 let NoOfChunks;
 let offeraddress1;
 let groups;
+let offerSectionData;
+let forSectionData;
+let chainStatus;
 let includeSelf = false;
-
 const OfferMarketCard = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [totalSteps, setTotalSteps] = useState(3);
@@ -47,14 +55,21 @@ const OfferMarketCard = () => {
   const [progress, setProgress] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
+  console.log(equivalent_asset)
   const handleNext = () => {
-    if (activeStep < totalSteps) {
+  console.log(equivalent_asset)
+
+    if (activeStep === 2) {
+      if (!OfferAmount1 || equivalent_asset[0].asset_address===undefined || !forSectionData[0].amount|| !offeraddress1) {
+        toast.error("Please Fill the required fields to move on to the next step");
+      } else {
+        setActiveStep(activeStep + 1);
+      }
+    } else if (activeStep < totalSteps) {
       setActiveStep(activeStep + 1);
-    }
-    if (progress === 0) {
-      setProgress(50);
     } else {
-      setProgress(100);
+      // Handle the case where activeStep is equal to or greater than totalSteps
+      toast.error("You have reached the last step");
     }
   };
 
@@ -63,34 +78,29 @@ const OfferMarketCard = () => {
       setActiveStep(activeStep - 1);
     }
 
-    if (progress === 100) {
-      setProgress(50);
-    } else {
-      setProgress(0);
-    }
+  
   };
 
-
-  const tokenApproval=async (value)=>{
-    try{
-    const { request } = await simulateContract(config, {
-      abi: erc20Abi,
-      address: testTokenAddress,
-      functionName: "approve",
-      //cook totalPrice
-      args: [contractAddress, parseEther(value)],
-    });
-    const hash = await writeContract(config, request);
-    const transactionReceipt = await waitForTransactionReceipt(config, {
-      // confirmations: 2,
-      hash: hash,
-    });
-    console.log('token Aapproved');
-    toast.success("Token Approved");
-  }catch(error){
-    console.log(error);
-  }
-}
+  const tokenApproval = async (value) => {
+    try {
+      const { request } = await simulateContract(config, {
+        abi: erc20Abi,
+        address: testTokenAddress,
+        functionName: "approve",
+        //cook totalPrice
+        args: [contractAddress, parseEther(value)],
+      });
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        // confirmations: 2,
+        hash: hash,
+      });
+      console.log("token Aapproved");
+      toast.success("Token Approved");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const addUserGroup = async (scenario) => {
     try {
@@ -98,7 +108,7 @@ const OfferMarketCard = () => {
         const { request } = await simulateContract(config, {
           abi: abi,
           address: contractAddress,
-          functionName: 'create_user_group',
+          functionName: "create_user_group",
           args: [includeSelf, groups],
         });
 
@@ -108,7 +118,8 @@ const OfferMarketCard = () => {
           hash: hash,
         });
         console.log(
-          `hash for scenario${scenario} , user group added ` + transactionReceipt
+          `hash for scenario${scenario} , user group added ` +
+            transactionReceipt
         );
         toast.success("The offer is now private");
       }
@@ -121,15 +132,15 @@ const OfferMarketCard = () => {
     try {
       if (equivalent_asset.length == 1) {
         //scenario 1
-        if (offeraddress1 == '0x0000000000000000000000000000000000000000') {
+        if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
           //scenario 1.1
-        //  console.log(OfferAmount1);
-        //  console.log(equivalent_asset);
-        //  console.log(NoOfChunks);
+          //  console.log(OfferAmount1);
+          //  console.log(equivalent_asset);
+          //  console.log(NoOfChunks);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
-            functionName: 'create_single_coin_offer',
+            functionName: "create_single_coin_offer",
             args: [equivalent_asset[0], NoOfChunks],
             value: parseEther(OfferAmount1.toString()),
           });
@@ -141,12 +152,12 @@ const OfferMarketCard = () => {
             hash: hash,
           });
           console.log(
-            'hash for scenario 1.1, offerCreated ' + transactionReceipt
+            "hash for scenario 1.1, offerCreated " + transactionReceipt
           );
           toast.success("Offer created successfully");
 
           if (groups.length > 0) {
-            await addUserGroup('1.1');
+            await addUserGroup("1.1");
           }
         } else {
           //scenario 1.2
@@ -154,7 +165,7 @@ const OfferMarketCard = () => {
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
-            functionName: 'create_single_token_offer',
+            functionName: "create_single_token_offer",
             args: [
               equivalent_asset[0],
               NoOfChunks,
@@ -169,22 +180,22 @@ const OfferMarketCard = () => {
             hash: hash,
           });
           console.log(
-            'hash for scenario 1.2, offerCreated ' + transactionReceipt
+            "hash for scenario 1.2, offerCreated " + transactionReceipt
           );
           toast.success("Offer created successfully");
 
           if (groups.length > 0) {
-            await addUserGroup('1.2');
+            await addUserGroup("1.2");
           }
         }
       } else if (equivalent_asset.length > 1) {
         //scenario 2
-        if (offeraddress1 == '0x0000000000000000000000000000000000000000') {
+        if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
           //scenario 2.1
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
-            functionName: 'create_multi_coin_offer',
+            functionName: "create_multi_coin_offer",
             args: [equivalent_asset, NoOfChunks],
             value: parseEther(OfferAmount1.toString()),
           });
@@ -195,10 +206,10 @@ const OfferMarketCard = () => {
             hash: hash,
           });
           console.log(
-            'hash for scenario 2.1, offerCreated ' + transactionReceipt
+            "hash for scenario 2.1, offerCreated " + transactionReceipt
           );
           toast.success("Offer created successfully");
-          if(groups.length>0){
+          if (groups.length > 0) {
             await addUserGroup("2.1");
           }
         } else {
@@ -207,8 +218,13 @@ const OfferMarketCard = () => {
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
-            functionName: 'create_multi_token_offer',
-            args: [equivalent_asset, NoOfChunks, parseEther(OfferAmount1), offeraddress1],
+            functionName: "create_multi_token_offer",
+            args: [
+              equivalent_asset,
+              NoOfChunks,
+              parseEther(OfferAmount1),
+              offeraddress1,
+            ],
           });
 
           const hash = await writeContract(config, request);
@@ -217,10 +233,10 @@ const OfferMarketCard = () => {
             hash: hash,
           });
           console.log(
-            'hash for scenario 2.2, offerCreated ' + transactionReceipt
+            "hash for scenario 2.2, offerCreated " + transactionReceipt
           );
           toast.success("Offer created successfully");
-          if(groups.length>0){
+          if (groups.length > 0) {
             await addUserGroup("2.2");
           }
         }
@@ -287,7 +303,7 @@ const OfferMarketCard = () => {
               <button
                 onClick={handleNext}
                 className={`bg-[#fec949] text-black px-4 py-2 rounded-md ${
-                  activeStep === 1 ? 'w-full' : 'w-[48%]'
+                  activeStep === 1 ? "w-full" : "w-[48%]"
                 } `}
               >
                 Next
@@ -478,17 +494,17 @@ const NftIcon = () => {
       >
         <g
           style={{
-            stroke: 'none',
+            stroke: "none",
             strokeWidth: 0,
-            strokeDasharray: 'none',
-            strokeLinecap: 'butt',
-            strokeLinejoin: 'miter',
+            strokeDasharray: "none",
+            strokeLinecap: "butt",
+            strokeLinejoin: "miter",
             strokeMiterlimit: 10,
-            fill: 'none',
-            fillRule: 'nonzero',
+            fill: "none",
+            fillRule: "nonzero",
             opacity: 1,
             transform:
-              'translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)',
+              "translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)",
           }}
         >
           <path
@@ -537,56 +553,56 @@ const Card1 = () => {
       <h1 className="text-white text-3xl py-2">Get Started</h1>
       <div className="flex py-4">
         <span className=" rounded-full bg-gray-700 bg-opacity-60 px-2 me-2 text-gray-400 text-sm text-center flex justify-center items-center">
-          1{' '}
-        </span>{' '}
+          1{" "}
+        </span>{" "}
         <h4 className="text-white "> Select Market</h4>
       </div>
       <div className="grid grid-cols-2 gap-1 md:grid-cols-3 md:gap-x-2 md:gap-y-2">
         <MarketCard
           logo={<TbArrowZigZag />}
-          title={'OTC'}
-          subtitle={'Trade pre-TGE'}
-          description={'token allocations.'}
+          title={"OTC"}
+          subtitle={"Trade pre-TGE"}
+          description={"token allocations."}
         />
         <MarketCard
           logo={<BsPCircle />}
-          title={'Points Market'}
-          subtitle={'Trade protocols'}
-          description={'points.'}
-          sooncheck={'soon'}
+          title={"Points Market"}
+          subtitle={"Trade protocols"}
+          description={"points."}
+          sooncheck={"soon"}
         />
         <MarketCard
           logo={<BiBitcoin />}
-          title={'Runes Market'}
-          subtitle={'Trade pre-launch'}
-          description={'Runes allocations.'}
-          sooncheck={'soon'}
+          title={"Runes Market"}
+          subtitle={"Trade pre-launch"}
+          description={"Runes allocations."}
+          sooncheck={"soon"}
         />
         <MarketCard
           logo={<FaScaleBalanced />}
-          title={'Runes DEX'}
-          subtitle={'Trade Runes OTC'}
-          sooncheck={'soon'}
+          title={"Runes DEX"}
+          subtitle={"Trade Runes OTC"}
+          sooncheck={"soon"}
         />
         <MarketCard
           logo={<NftIcon />}
-          title={'NFT Whitelists'}
-          subtitle={'Trade Pre-Mint NFT '}
-          description={'Whitelist'}
-          sooncheck={'soon'}
+          title={"NFT Whitelists"}
+          subtitle={"Trade Pre-Mint NFT "}
+          description={"Whitelist"}
+          sooncheck={"soon"}
         />
         <MarketCard
           logo={<FaLockOpen />}
-          title={'Vesting Market'}
-          subtitle={'Trade Vesting Token Ownership'}
-          sooncheck={'soon'}
+          title={"Vesting Market"}
+          subtitle={"Trade Vesting Token Ownership"}
+          sooncheck={"soon"}
         />
       </div>
 
       <div className="flex py-4">
         <span className=" rounded-full bg-gray-700 bg-opacity-60 px-2 me-2 text-gray-400 text-sm text-center flex justify-center items-center">
-          2{' '}
-        </span>{' '}
+          2{" "}
+        </span>{" "}
         <h4 className="text-white "> Select Network</h4>
       </div>
       <div className=" flex flex-wrap gap-2">
@@ -611,18 +627,18 @@ const Card1 = () => {
           icon={
             <AiFillMediumSquare className=" mr-1 text-black bg-yellow-500 rounded" />
           }
-        />{' '}
+        />{" "}
         <Network name="Linea" icon={<FcScatterPlot className=" mr-1" />} />
         <Network
           name="Blast"
           icon={
             <AiOutlineBold
               className={
-                'mr-1 p-[1px] italic font-bold bg-black rounded text-yellow-500'
+                "mr-1 p-[1px] italic font-bold bg-black rounded text-yellow-500"
               }
             />
           }
-        />{' '}
+        />{" "}
         <Network
           name="Manta Pacific"
           icon={<FcDoughnutChart className=" mr-1" />}
@@ -654,18 +670,18 @@ const Card1 = () => {
 
 const Card2 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedChain, setSelectedChain] = useState('');
+  const [selectedChain, setSelectedChain] = useState("");
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('Partial Fill');
-  const [todoAddAddress, setTodoAddAddress] = useState('');
+  const [selectedOption, setSelectedOption] = useState("Partial Fill");
+  const [todoAddAddress, setTodoAddAddress] = useState("");
   const [todoAddressData, setTodoAdressData] = useState([]);
   const [offerAmount, SetOfferAmount] = useState(0);
   const [PartialFillChunkSize, SetPartialFillChunkSize] = useState(2);
   const [tooltip, setTooltip] = useState(null);
   const [ischecked, setischecked] = useState(false);
   const [forAmounts, setForAmounts] = useState([
-    { amount: '', token: null, isDropdownOpen: false },
+    { amount: "", token: null, isDropdownOpen: false },
   ]);
   OfferAmount1 = offerAmount;
   NoOfChunks = PartialFillChunkSize;
@@ -676,8 +692,9 @@ const Card2 = () => {
 
   const handleChainSelect = (chain) => {
     if (forAmounts.some((item) => item.token?.name === chain.name)) {
-   
-      toast.error('This token is already selected in forAmounts. Please choose another token.');
+      toast.error(
+        "This token is already selected in forAmounts. Please choose another token."
+      );
       return;
     }
     setSelectedChain(chain);
@@ -687,64 +704,70 @@ const Card2 = () => {
   // Array of chain options
   const chainOptions = [
     {
-      name: 'ETH',
-      icon: '/assets/images/Ethereum_logo.png',
-      address: '0x0000000000000000000000000000000000000000',
+      name: "ETH",
+      icon: "/assets/images/Ethereum_logo.png",
+      address: "0x0000000000000000000000000000000000000000",
     },
     {
-      name: 'ABD',
-      icon: '/tokenImages/token3.png',
-      address: '0x2421f82ABfEe7C620C01B828a7B2E7141672c612',
-    },{
-      name: 'syn-test',
-      icon: '/assets/images/Ethereum_logo.png',
-      address: '0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f',
+      name: "ABD",
+      icon: "/tokenImages/token3.png",
+      address: "0x2421f82ABfEe7C620C01B828a7B2E7141672c612",
     },
     {
-      name: 'PEPE',
-      icon: '/tokenImages/token1.png',
-      address: '0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931',
+      name: "syn-test",
+      icon: "/assets/images/Ethereum_logo.png",
+      address: "0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f",
     },
     {
-      name: 'SyndicatorLabs',
-      icon: '/tokenImages/token2.png',
-      address: '0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb',
+      name: "PEPE",
+      icon: "/tokenImages/token1.png",
+      address: "0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931",
     },
     {
-      name: 'Bitcoin',
-      icon: '/tokenImages/token3.png',
-      address: '0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7',
+      name: "SyndicatorLabs",
+      icon: "/tokenImages/token2.png",
+      address: "0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb",
     },
     {
-      name: 'Doge',
-      icon: '/tokenImages/token4.png',
-      address: '0x9bc8388dD439fa3365B1F78A81242aDBB4677759',
+      name: "Bitcoin",
+      icon: "/tokenImages/token3.png",
+      address: "0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7",
     },
     {
-      name: 'FI',
-      icon: '/tokenImages/token5.png',
-      address: '0xe6714a67cabd598882C42e2719908E648E734ec3',
+      name: "Doge",
+      icon: "/tokenImages/token4.png",
+      address: "0x9bc8388dD439fa3365B1F78A81242aDBB4677759",
+    },
+    {
+      name: "FI",
+      icon: "/tokenImages/token5.png",
+      address: "0xe6714a67cabd598882C42e2719908E648E734ec3",
     },
   ];
 
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());
   const assetsData =
-    forAmounts &&
+    (forAmounts && forAmounts.length > 0) &&
     forAmounts.map((val, ind) => {
       return {
         chunk_size: ethers.utils.parseUnits(
           (val?.amount / PartialFillChunkSize).toString(),
-          'ether'
+          "ether"
         ),
         asset_address: val.token?.address,
       };
     });
   // console.log(assetsData)
   offeraddress1 = selectedChain?.address;
-  console.log(offeraddress1);
+  // console.log(assetsData.length);
+
   equivalent_asset = assetsData;
   groups = todoAddressData;
+  forSectionData = forAmounts;
+  offerSectionData = selectedChain;
+  chainStatus = selectedOption;
+
   const toggleDropdownAddedBox = (index) => {
     setForAmounts((prev) =>
       prev.map((item, i) =>
@@ -755,15 +778,17 @@ const Card2 = () => {
 
   const handleTokenSelect = (index, token) => {
     if (forAmounts.some((item) => item.token?.name === token.name)) {
-      
-      toast.error('This token has already been selected in another box. Please choose a different token.');
+      toast.error(
+        "This token has already been selected in another box. Please choose a different token."
+      );
       return;
     }
 
     if (token.name === selectedChain?.name) {
- 
-      toast.error('This token is already selected for the offer amount. Please choose another token.');
-      
+      toast.error(
+        "This token is already selected for the offer amount. Please choose another token."
+      );
+
       return;
     }
     setForAmounts((prev) =>
@@ -785,19 +810,18 @@ const Card2 = () => {
     const allValid = forAmounts.every((item) => item.amount && item.token);
 
     if (!allValid) {
-    
-      toast.error('Please fill the certain fields');
+      toast.error("Please fill the certain fields");
       return;
     }
 
     if (forAmounts.length >= 5) {
-      toast.error('Limit exceeded');
+      toast.error("Limit exceeded");
       return;
     }
 
     setForAmounts((prev) => [
       ...prev,
-      { amount: '', token: null, isDropdownOpen: false },
+      { amount: "", token: null, isDropdownOpen: false },
     ]);
   };
 
@@ -807,8 +831,8 @@ const Card2 = () => {
     if (todoAddAddress.length === 42) {
       setTodoAdressData((prev) => [...prev, todoAddAddress]);
     } else {
-      setTodoAddAddress('');
-      toast.error('address should be 42 digit long');
+      setTodoAddAddress("");
+      toast.error("address should be 42 digit long");
     }
   };
 
@@ -838,16 +862,16 @@ const Card2 = () => {
   };
 
   const handleMouseLeave = () => setTooltip(null);
-  console.log(PartialFillChunkSize);
-
+  // console.log(PartialFillChunkSize);
 
   //check function for private fill
-  const handlechecked=(e)=>{
-    setischecked(e.target.checked)
-  }
-  console.log(ischecked)
+  const handlechecked = (e) => {
+    setischecked(e.target.checked);
+  };
+  // console.log(ischecked)
 
-  
+  // console.log(selectedChain)
+
   return (
     <div
       className=" 
@@ -862,7 +886,7 @@ const Card2 = () => {
       <div
         style={{
           boxShadow:
-            '0 1px 4px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
+            "0 1px 4px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)",
         }}
         className="flex flex-wrap px-2 sm:px-4 py-2 sm:p-4 bg-[#15161b] rounded-md justify-between w-full "
       >
@@ -870,7 +894,7 @@ const Card2 = () => {
           <div className="flex items-center w-full">
             <span
               className="text-xs px-2 py-0.5 rounded-sm text-gray-300 font-bold"
-              style={{ fontSize: '60%' }}
+              style={{ fontSize: "60%" }}
             >
               OFFER
             </span>
@@ -891,7 +915,7 @@ const Card2 = () => {
           <input
             type="number"
             inputMode="numeric"
-            value={offerAmount === 0 ? '' : offerAmount}
+            value={offerAmount === 0 ? "" : offerAmount}
             onChange={(e) => SetOfferAmount(e.target.value)}
             placeholder="Enter amount to offer"
             className=" bg-transparent px-2 py-1 mt-2 w-full sm:w-auto outline-none border-none text-white text-xl"
@@ -906,13 +930,13 @@ const Card2 = () => {
               {selectedChain.icon ? (
                 <img
                   src={selectedChain.icon}
-                  alt={selectedChain.name || 'Solana'}
+                  alt={selectedChain.name || "Solana"}
                   className="w-4 h-4 mr-1"
                 />
               ) : (
-                'Select Token'
+                "Select Token"
               )}
-              <span className="text-sm">{selectedChain.name || ''}</span>
+              <span className="text-sm">{selectedChain.name || ""}</span>
               <FiChevronDown color="#94a3b8" />
             </button>
             {isDropdownOpen && (
@@ -952,7 +976,7 @@ const Card2 = () => {
             key={index}
             style={{
               boxShadow:
-                '0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)',
+                "0 0px 1px 0 rgba(255, 255, 255, 0.0001), 0 1px 3px 0 rgba(255, 255, 255, 0.1)",
             }}
             className="flex relative flex-wrap p-2 sm:p-4 bg-[#15161b] rounded-md justify-between mt-[6px]"
           >
@@ -960,7 +984,7 @@ const Card2 = () => {
               <div className="flex items-center w-full">
                 <span
                   className="text-xs px-1 py-0.5 rounded-sm text-gray-300 font-bold text-left"
-                  style={{ fontSize: '70%' }}
+                  style={{ fontSize: "70%" }}
                 >
                   FOR
                 </span>
@@ -1005,10 +1029,10 @@ const Card2 = () => {
                         className="w-4 h-4 mr-1"
                       />
                     ) : (
-                      'Select Token'
+                      "Select Token"
                     )}
                     <span className="text-sm">
-                      {forAmount.token?.name || ''}
+                      {forAmount.token?.name || ""}
                     </span>
                     <FiChevronDown color="#94a3b8" />
                   </button>
@@ -1057,8 +1081,8 @@ const Card2 = () => {
               type="radio"
               name="radio"
               value="Partial Fill"
-              checked={selectedOption === 'Partial Fill'}
-              onChange={() => setSelectedOption('Partial Fill')}
+              checked={selectedOption === "Partial Fill"}
+              onChange={() => setSelectedOption("Partial Fill")}
             />
             <span className="checkmark"></span>
             <span className="ms-7 text-white text-sm">Partial Fill</span>
@@ -1067,7 +1091,7 @@ const Card2 = () => {
             Multiple Users can contribute to fulfill their offer
           </p>
         </div>
-        {selectedOption === 'Partial Fill' || PartialFillChunkSize >1 ?(
+        {selectedOption === "Partial Fill" || PartialFillChunkSize > 1 ? (
           <div className="flex relative w-full flex-col mt-6">
             {/* Progress bar container */}
             <div className="w-full z-50 h-5 relative flex items-center">
@@ -1100,7 +1124,7 @@ const Card2 = () => {
                     className="absolute -top-8 text-white bg-gray-800 p-1 rounded-md"
                     style={{
                       left: `${tooltip.position}px`,
-                      transform: 'translateX(-50%)',
+                      transform: "translateX(-50%)",
                     }}
                   >
                     {tooltip.chunkSize}
@@ -1114,8 +1138,8 @@ const Card2 = () => {
                   key={value}
                   className={`w-4 h-4 ${
                     PartialFillChunkSize >= value
-                      ? 'bg-[#00e641]'
-                      : 'bg-slate-600 border-gray-400 bg-opacity-100'
+                      ? "bg-[#00e641]"
+                      : "bg-slate-600 border-gray-400 bg-opacity-100"
                   } cursor-pointer bg-opacity-100 rounded-full`}
                 ></div>
               ))}
@@ -1130,15 +1154,17 @@ const Card2 = () => {
               <p className="text-xs">100</p>
             </div>
           </div>
-        ):""}
+        ) : (
+          ""
+        )}
         <div onClick={() => SetPartialFillChunkSize(1)}>
           <div className="container">
             <input
               type="radio"
               name="radio"
               value="Entire Fill"
-              checked={selectedOption === 'Entire Fill'}
-              onChange={() => setSelectedOption('Entire Fill')}
+              checked={selectedOption === "Entire Fill"}
+              onChange={() => setSelectedOption("Entire Fill")}
             />
             <span className="checkmark"></span>
             <span className="ms-7 text-white text-sm">Entire Fill</span>
@@ -1154,8 +1180,8 @@ const Card2 = () => {
               type="radio"
               name="radio"
               value="Private Fill"
-              checked={selectedOption === 'Private Fill'}
-              onChange={() => setSelectedOption('Private Fill')}
+              checked={selectedOption === "Private Fill"}
+              onChange={() => setSelectedOption("Private Fill")}
             />
             <span className="checkmark"></span>
             <span className="ms-7 text-white text-sm">Private Fill</span>
@@ -1164,7 +1190,7 @@ const Card2 = () => {
             Offer can only be filled by whitelisted user
           </p>
         </div>
-        {selectedOption === 'Private Fill' && (
+        {selectedOption === "Private Fill" && (
           <div className="w-full mt-6 p-4 bg-[#15161B] rounded-lg shadow-md">
             <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
               <input
@@ -1182,16 +1208,22 @@ const Card2 = () => {
                 Add Address
               </button>
             </div>
-            <div style={{marginTop: "14px"}} className="container flex items-center gap-2 mt-2  text-sm">
-            <input
-              type="checkbox"
-              name="checkbox"
-              checked={ischecked} onChange={(e)=>handlechecked(e)}
-            />
-            <span className="checkmark"></span>
-            <span className="ms-7 text-white text-sm mt-1">Include Yourself</span>
-          </div>
-             <div
+            <div
+              style={{ marginTop: "14px" }}
+              className="container flex items-center gap-2 mt-2  text-sm"
+            >
+              <input
+                type="checkbox"
+                name="checkbox"
+                checked={ischecked}
+                onChange={(e) => handlechecked(e)}
+              />
+              <span className="checkmark"></span>
+              <span className="ms-7 text-white text-sm mt-1">
+                Include Yourself
+              </span>
+            </div>
+            <div
               id="forAmountScrollbar"
               className="mt-4 max-h-[120px] overflow-y-auto"
             >
@@ -1224,8 +1256,8 @@ const Card2 = () => {
 const Card3 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
-  const [selectedChain, setSelectedChain] = useState('');
-  const [selectedChain1, setSelectedChain1] = useState('');
+  const [selectedChain, setSelectedChain] = useState("");
+  const [selectedChain1, setSelectedChain1] = useState("");
   const [showInfo, setShowInfo] = useState(false);
   const [showInfo1, setShowInfo1] = useState(false);
 
@@ -1247,73 +1279,84 @@ const Card3 = () => {
 
   // Array of chain options
   const chainOptions = [
-    { name: 'Solana', icon: '/assets/images/Solana_logo.png' },
-    { name: 'Ethereum', icon: '/assets/images/Ethereum_logo.png' },
+    { name: "Solana", icon: "/assets/images/Solana_logo.png" },
+    { name: "Ethereum", icon: "/assets/images/Ethereum_logo.png" },
   ];
   return (
     <div className=" md:p-3 rounded-lg  max-w-lg flex flex-col w-full md:w-screen overflow-hidden">
       <p
-        style={{ lineHeight: '1' }}
+        style={{ lineHeight: "1" }}
         className="my-3 mt-3 px-4 text-[1.7rem] font-semibold"
       >
-        You want to <span className=" text-[#2aca54] ">offer 10 MACH7</span> for{' '}
-        <span className=" text-[#2aca54]">0.1234 ETH</span>
+        You want to{" "}
+        <span className=" text-[#2aca54] ">
+          offer {OfferAmount1 + " " + offerSectionData.name}
+        </span>{" "}
+        for{" "}
+        <span className=" text-[#2aca54]">
+          {forSectionData
+            .map((val) => " " + val.amount + " " + val.token.name)
+            .join(",")}
+        </span>
       </p>
       <div className="m-2 border border-gray-700 rounded-md">
         <div className="flex  justify-between  border-b border-gray-700 p-2 px-3">
           <div className="flex">
-            {' '}
+            {" "}
             <span
               className="text-md pe-1 py-0.5  rounded-sm   text-gray-500  text-left bg-opacity-30"
-              style={{ fontSize: '90%' }}
+              style={{ fontSize: "90%" }}
             >
-              Price per MACH7
+              Price per {offerSectionData.name}
             </span>
             <div className="relative">
               <CiCircleInfo color="white" className=" mt-1.5" size={12} />
             </div>
           </div>
           <div>
-            {' '}
+            {" "}
             <span className="text-md  text-gry-300 tracking-wide	">
-              0.0832 <strong>ETH</strong>{' '}
-            </span>{' '}
+              0.0832 <strong>ETH</strong>{" "}
+            </span>{" "}
           </div>
         </div>
         <div className="flex  justify-between border-b border-gray-700 p-2 px-3">
           <div className="flex">
-            {' '}
+            {" "}
             <span
               className="text-md pe-1 py-0.5  rounded-sm  text-gray-500  text-left bg-opacity-30"
-              style={{ fontSize: '90%' }}
+              style={{ fontSize: "90%" }}
             >
               Amount
             </span>
             <div className="relative">
               <CiCircleInfo color="white" className=" mt-[7px]" size={12} />
             </div>
-          </div>{' '}
+          </div>{" "}
           <div>
             <div className="flex items-center ">
-              <span className="text-md  text-gray-300 tracking-wide	">
-                3,000
-              </span>
-              <div className="w-5 h-5 overflow-hidden rounded-full">
-                <img
-                  src="/assets/images/Ethereum_logo.png"
-                  alt="token-img"
-                  className="object-cover w-half h-half"
-                />
-              </div>
+               
+                  <span className="text-md  text-gray-300 tracking-wide	">
+                    {OfferAmount1}
+                  </span>
+                  <div className="w-5 h-5 overflow-hidden rounded-full">
+                    {console.log(offeraddress1)}
+                    <img
+                      src={getTokenImage(offeraddress1)}
+                      alt="token-img"
+                      className="object-cover w-half h-half"
+                    />
+              
+                </div>
             </div>
           </div>
         </div>
         <div className="flex  justify-between border-b border-gray-700 p-2 px-3">
           <div className="flex">
-            {' '}
+            {" "}
             <span
               className="text-md pe-1 py-0.5  rounded-sm  text-gray-500  text-left bg-opacity-30"
-              style={{ fontSize: '90%' }}
+              style={{ fontSize: "90%" }}
             >
               FOR
             </span>
@@ -1323,16 +1366,21 @@ const Card3 = () => {
           </div>
           <div>
             <div className="flex items-center ">
-              <span className="text-md text-gray-300 tracking-wide	">
-                0.1234{' '}
-              </span>{' '}
-              <div className="w-5 h-5 overflow-hidden rounded-full">
-                <img
-                  src="/assets/images/Solana_logo.png"
-                  alt="token-img"
-                  className="object-cover w-half h-half"
-                />
-              </div>
+              {forSectionData.map((val, index) => (
+                <div key={index} className="flex items-center">
+                  <span className="text-md me-[2px] text-gray-300 tracking-wide	">
+                    {val.amount}
+                  </span>
+                  <div className="w-5 h-5 overflow-hidden rounded-full">
+                    <img
+                      src={val.token.icon}
+                      alt="token-img"
+                      className="object-cover w-half h-half"
+                    />
+                  </div>
+                  {index < forSectionData.length - 1 && <span>{", "}</span>}
+                  </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1345,9 +1393,9 @@ const Card3 = () => {
             </div>
           </div>
           <div className=" flex">
-            {' '}
+            {" "}
             <span className="border border-gray-800 rounded-full bg-opacity-30 text-xs text-gray-500  py-[2px] px-2 	font-medium	">
-              PARTIAL
+              {chainStatus}
             </span>
           </div>
         </div>
@@ -1361,39 +1409,39 @@ const MarketCard = ({ logo, title, subtitle, description, sooncheck }) => {
     <div
       aria-disabled={true}
       className={`border-2 ${
-        title.toString().includes('OTC')
-          ? 'hover:border-yellow-500 MarketCardHover cursor-pointer border-gray-800 '
-          : 'border-gray-800 border-opacity-25 '
+        title.toString().includes("OTC")
+          ? "hover:border-yellow-500 MarketCardHover cursor-pointer border-gray-800 "
+          : "border-gray-800 border-opacity-25 "
       }    rounded-md py-6 relative `}
     >
       <div className="flex items-center justify-center flex-col ">
         <span
           className={`HoverLogo ${
-            title.toString().includes('OTC') ? 'opacity-70' : 'opacity-10'
+            title.toString().includes("OTC") ? "opacity-70" : "opacity-10"
           } text-white  font-bold text-[1.7rem]`}
         >
           {logo}
         </span>
         <h5
           className={`text-white text-sm  text-center ${
-            title.toString().includes('NFT') ? 'pt-1' : 'pt-3'
-          } ${title.toString().includes('OTC') ? 'opacity-70' : 'opacity-10'}`}
+            title.toString().includes("NFT") ? "pt-1" : "pt-3"
+          } ${title.toString().includes("OTC") ? "opacity-70" : "opacity-10"}`}
         >
           {title}
         </h5>
         <span
           className={`text-xs text-center text-white my-1 ${
-            title.toString().includes('OTC') ? 'opacity-40' : 'opacity-10'
+            title.toString().includes("OTC") ? "opacity-40" : "opacity-10"
           }`}
         >
           {subtitle}
         </span>
         <p
           className={`text-xs text-center text-white ${
-            title.toString().includes('OTC') ? 'opacity-40' : 'opacity-10'
+            title.toString().includes("OTC") ? "opacity-40" : "opacity-10"
           } `}
         >
-          {description}{' '}
+          {description}{" "}
         </p>
         <span className=" absolute top-1 text-sm rounded-full px-2 right-1 bg-slate-500 bg-opacity-55 opacity-15">
           {sooncheck && sooncheck}
@@ -1407,9 +1455,9 @@ const Network = ({ name, icon }) => {
   return (
     <div
       className={`border ${
-        name.toString().toLowerCase().includes('ethereum')
-          ? 'border-gray-800  hover:border-yellow-500 cursor-pointer '
-          : 'border-gray-600 text-white opacity-10'
+        name.toString().toLowerCase().includes("ethereum")
+          ? "border-gray-800  hover:border-yellow-500 cursor-pointer "
+          : "border-gray-600 text-white opacity-10"
       } rounded-md py-2 px-2 overflow-hidden`}
     >
       <div className="flex items-center">

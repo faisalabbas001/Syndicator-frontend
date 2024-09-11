@@ -17,8 +17,8 @@ const OTCcard = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedChain, setSelectedChain] = useState({
-    chunk_size: '',
-    asset_address: '',
+    chunk_size: data.requested_assets[0].chunk_size,
+    asset_address: data.requested_assets[0].asset_address,
     indexToAccept: 0,
   });
 

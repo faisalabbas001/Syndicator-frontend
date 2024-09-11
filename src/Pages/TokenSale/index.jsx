@@ -401,15 +401,15 @@ const TokenSale = () => {
               <p className="mb-1 text-stone-300 font-semibold">
                 Remaining Tokens:{' '}
               </p>
-              <span className=" ms-auto text-gray-400">60,000,000 M7</span>
+              <span className=" ms-auto text-gray-400">{formater(stateData.amount) + " " + getTokenSymbol(stateData.owned_asset.asset_address)}</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">Offer ID: </p>
-              <span className=" ms-auto text-gray-400">M7</span>
+              <span className=" ms-auto text-gray-400">{stateData.offerId}</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">Creator: </p>
-              <span className=" ms-auto text-gray-400">1</span>
+              <span className=" ms-auto text-gray-400">{stateData.owner.slice(0,4) + "..." + stateData.owner.slice(-4)}</span>
             </div>
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
@@ -433,7 +433,8 @@ const TokenSale = () => {
               <p className="mb-2 text-stone-300 font-semibold">
                 Minimum Fill:{' '}
               </p>
-              <span className=" ms-auto text-gray-400">1 M7</span>
+              <span className=" ms-auto text-gray-400">  {formater(stateData.selectedChain.chunk_size)}{' '}
+              {getTokenSymbol(stateData.selectedChain.asset_address)}{' '}</span>
             </div>
           </div>
         </div>

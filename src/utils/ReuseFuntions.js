@@ -100,6 +100,9 @@
     else if (address === '0xe6714a67cabd598882C42e2719908E648E734ec3') {
       return 'Fideum';
     }
+    else if (address === "0x2421f82ABfEe7C620C01B828a7B2E7141672c612") {
+      return 'Hello_Token';
+    }
     else {
       return 'TEST-TOKEN';
     }

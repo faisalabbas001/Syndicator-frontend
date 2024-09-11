@@ -3,8 +3,13 @@ import { PiArrowsClockwiseBold } from "react-icons/pi";
 import { LuListFilter } from "react-icons/lu";
 import { LuArrowUpDown } from "react-icons/lu";
 import "../App.css"
+import { useHeaderData } from "../HeaderContext";
 
 const HorizontalToolbar = () => {
+
+  const { filterByAmount, setFilterbyamount,setFilterByTokenName,filterByTokenName, setCallTheFunction} = useHeaderData();
+
+  console.log(filterByAmount);
   return (
     <div className="custom-gray-light py-2 md:px-2">
     <div className="flex flex-wrap justify-between items-center gap-1 md:gap-2 text-sm ">
@@ -29,12 +34,13 @@ const HorizontalToolbar = () => {
         <label className="px-2 py-1 flex items-center">
           <LuArrowUpDown size={15} className="mr-1" /> Price:
         </label>
-        <select className="border border-gray-800 rounded px-2 py-1 bg-zinc-950">
+        <select value={filterByAmount} onChange={(e) => setFilterbyamount(e.target.value)} className="border border-gray-800 rounded px-2 py-1 bg-zinc-950">
+            <option value="">Apply Filter By Price</option>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </select>
         <div>
-        <button className="border border-gray-800 rounded px-2 py-[6px]">
+        <button onClick={() => window.location.reload()} className="border border-gray-800 rounded px-2 py-[6px]">
           <PiArrowsClockwiseBold size={16} />
         </button>
       </div>
@@ -46,12 +52,14 @@ const HorizontalToolbar = () => {
       {/* Search Field */}
       <div className="flex items-center flex-wrap gap-1">
         <input 
+          value={filterByTokenName} 
+          onChange={(e) => setFilterByTokenName(e.target.value)}
           type="text" 
           placeholder="Enter token name or mint address" 
           className="border border-gray-800 rounded min-w-0 w-[60%] sm:w-auto px-1 sm:px-2 py-1 bg-zinc-950" 
         />
-        <button className="border border-gray-800 rounded px-2 py-1 flex items-center gap-1">
-          <LuListFilter size={18} /> Filter
+        <button  onClick={()=> setCallTheFunction(true)}  className="border border-gray-800 rounded px-2 py-1 flex items-center gap-1">
+          <LuListFilter size={18}/> Filter
         </button>
       </div>
   
