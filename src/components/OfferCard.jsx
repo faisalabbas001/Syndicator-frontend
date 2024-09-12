@@ -34,6 +34,7 @@ import {
   contractAddress,
   erc20Abi,
   testTokenAddress,
+  formater
 } from "../BlockChainContext/helper";
 import { nonceManager, parseEther } from "viem";
 import { config } from "../BlockChainContext/config";
@@ -81,11 +82,11 @@ const OfferMarketCard = () => {
   
   };
 
-  const tokenApproval = async (value) => {
+  const tokenApproval = async (value,address) => {
     try {
       const { request } = await simulateContract(config, {
         abi: erc20Abi,
-        address: testTokenAddress,
+        address: address,
         functionName: "approve",
         //cook totalPrice
         args: [contractAddress, parseEther(value)],
@@ -102,9 +103,23 @@ const OfferMarketCard = () => {
     }
   };
 
-  const addUserGroup = async (scenario) => {
+  async function extractValues(data) {
+    // Remove the '0x' prefix
+    const cleanData = data.slice(2);
+
+    // Split data into 64 character (32-byte) segments
+    const segments = cleanData.match(/.{1,64}/g);
+
+    // Convert each segment from hex to decimal
+    const values = segments.map(segment => BigInt('0x' + segment));
+
+    return values;
+}
+
+  const addUserGroup = async (scenario,offerId) => {
     try {
       if (groups.length > 0) {
+         console.log(offerId);
         const { request } = await simulateContract(config, {
           abi: abi,
           address: contractAddress,
@@ -118,10 +133,31 @@ const OfferMarketCard = () => {
           hash: hash,
         });
         console.log(
-          `hash for scenario${scenario} , user group added ` +
             transactionReceipt
         );
+        const data =await extractValues(transactionReceipt.logs[0].data);
+        const groupId=Number(formater(data[0]));
+        console.log(typeof(groupId));
+        console.log(data[0]);
+        
+        toast.success("group created! attaching offer....");
+
+
+        const { request2 } = await simulateContract(config, {
+          abi: abi,
+          address: contractAddress,
+          functionName: "add_include_group",
+          args: [offerId,groupId],
+        });
+
+        const hash2 = await writeContract(config, request2);
+        const transactionReceipt2 = await waitForTransactionReceipt(config, {
+          // confirmations: 2,
+          hash: hash,
+        });
+        console.log(transactionReceipt2);
         toast.success("The offer is now private");
+
       }
     } catch (error) {
       console.log(error);
@@ -151,17 +187,19 @@ const OfferMarketCard = () => {
             // confirmations: 2,
             hash: hash,
           });
+          const id=transactionReceipt.logs[1].topics[1];
+          const odDecimal = parseInt(Number(formater(id)));
           console.log(
-            "hash for scenario 1.1, offerCreated " + transactionReceipt
+            odDecimal
           );
           toast.success("Offer created successfully");
 
           if (groups.length > 0) {
-            await addUserGroup("1.1");
+            await addUserGroup("1.1",odDecimal);
           }
         } else {
           //scenario 1.2
-          await tokenApproval(OfferAmount1);
+          await tokenApproval(OfferAmount1,offeraddress1);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
@@ -179,13 +217,15 @@ const OfferMarketCard = () => {
             // confirmations: 2,
             hash: hash,
           });
+          const id=transactionReceipt.logs[1].topics[1];
+          const odDecimal = parseInt(id, 16);
           console.log(
-            "hash for scenario 1.2, offerCreated " + transactionReceipt
+            odDecimal
           );
           toast.success("Offer created successfully");
 
           if (groups.length > 0) {
-            await addUserGroup("1.2");
+            await addUserGroup("1.2",odDecimal);
           }
         }
       } else if (equivalent_asset.length > 1) {
@@ -205,16 +245,18 @@ const OfferMarketCard = () => {
             // confirmations: 2,
             hash: hash,
           });
+          const id=transactionReceipt.logs[1].topics[1];
+          const odDecimal = parseInt(id, 16);
           console.log(
-            "hash for scenario 2.1, offerCreated " + transactionReceipt
+            odDecimal
           );
           toast.success("Offer created successfully");
           if (groups.length > 0) {
-            await addUserGroup("2.1");
+            await addUserGroup("2.1",odDecimal);
           }
         } else {
           //scenario 2.2
-          await tokenApproval(OfferAmount1);
+          await tokenApproval(OfferAmount1,offeraddress1);
           const { request } = await simulateContract(config, {
             abi: abi,
             address: contractAddress,
@@ -232,12 +274,14 @@ const OfferMarketCard = () => {
             // confirmations: 2,
             hash: hash,
           });
+          const id=transactionReceipt.logs[1].topics[1];
+          const odDecimal = parseInt(id, 16);
           console.log(
-            "hash for scenario 2.2, offerCreated " + transactionReceipt
+            odDecimal
           );
           toast.success("Offer created successfully");
           if (groups.length > 0) {
-            await addUserGroup("2.2");
+            await addUserGroup("2.2",odDecimal);
           }
         }
       }

@@ -99,11 +99,11 @@ const TokenSale = () => {
     SetForValue(fullForValue);
   }, [PartialFillChunkSize, stateData.amount, stateData.requested_assets]);
 
-  const tokenApproval = async (value) => {
+  const tokenApproval = async (value,tokenAddress) => {
     try {
       const { request } = await simulateContract(config, {
         abi: erc20Abi,
-        address: testTokenAddress,
+        address: tokenAddress,
         functionName: 'approve',
         //cook totalPrice
         args: [contractAddress, value.includes(".hello") ? value.split(".hello")[0] : parseEther(value)],
@@ -122,7 +122,13 @@ const TokenSale = () => {
   const AMOWT = async () => {
     try {
       console.log("AMOWT")
-      await tokenApproval(`${stateData.requested_assets[0].chunk_size}.hello`);
+      console.log("AMOWT args:", [
+        stateData.offerId,
+        stateData.selectedChain.indexToAccept,
+        stateData.selectedChain.asset_address,
+        stateData.selectedChain.chunk_size
+      ]);
+      await tokenApproval(`${stateData.selectedChain.chunk_size}.hello`,stateData.selectedChain.asset_address);
       const { request } = await simulateContract(config, {
         abi: abi,
         address: contractAddress,
@@ -131,7 +137,7 @@ const TokenSale = () => {
           stateData.offerId,
           stateData.selectedChain.indexToAccept,
           stateData.selectedChain.asset_address,
-          parseEther(stateData.requested_assets[stateData.selectedChain.indexToAccept].chunk_size),
+          stateData.selectedChain.chunk_size,
         ],
       });
 
@@ -171,12 +177,12 @@ const TokenSale = () => {
   const ASOWT = async () => {
     try {
       console.log("ASOWT")
-      await tokenApproval(`${(Number(formater(stateData.requested_assets[0].chunk_size)))*PartialFillChunkSize}`);
+      await tokenApproval(`${(Number(formater(stateData.requested_assets[0].chunk_size)))*PartialFillChunkSize}`,stateData.selectedChain.asset_address);
       const { request } = await simulateContract(config, {
         abi: abi,
         address: contractAddress,
         functionName: 'accept_single_offer_with_tokens',
-        args: [stateData.offerId, stateData.requested_assets[0].chunk_size],
+        args: [stateData.offerId, stateData.selectedChain.chunk_size],
       });
 
       const hash = await writeContract(config, request);

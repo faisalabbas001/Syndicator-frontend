@@ -179,7 +179,7 @@ const OTCcard = ({
                             <li key={index}>
                               <button
                                 className="flex items-center w-full px-3 py-2 text-white text-xs hover:bg-gray-700"
-                                onClick={() => handleChainSelect({...chain,index})}
+                                onClick={() => handleChainSelect({...chain,indexToAccept: index})}
                               >
                                 <img
                                   src={getTokenImage(chain.asset_address)}
