@@ -1,4 +1,4 @@
-import {ethers} from 'ethers';
+import {ethers,BigNumber} from 'ethers';
 export const  abi=[
 	{
 		"inputs": [
@@ -987,10 +987,33 @@ export const  abi=[
 ];
 export const contractAddress="0x4C2621766B11784C0472200C3b1DfE654C5A7188";
 export const decimal=18;
-export const formater=(value)=>{
-    return ethers.utils.formatUnits(Number(value).toString(),decimal);
 
-}
+export const formater = (value) => {
+  try {
+    // Convert the value to a string without scientific notation
+    const valueAsString = value.toLocaleString('fullwide', { useGrouping: false });
+    return ethers.utils.formatUnits(BigNumber.from(valueAsString), 18); 
+  } catch (error) {
+    console.error("Error formatting value:", error);
+    return "N/A";
+  }
+};
+
+export const formaterWithInteger = (value) => {
+	try {
+		// Ensure the value is a BigNumber and avoid converting it to a floating-point number
+		const bigValue = BigNumber.from(value); // Handle it as a BigNumber from the start
+	
+		// Format the BigNumber value using 18 decimals (assuming the value is in Wei or other 18 decimal units)
+		const formattedValue = ethers.utils.formatUnits(bigValue, 18);
+	
+		return formattedValue;
+	  } catch (error) {
+		console.error("Error formatting value:", error);
+		return "N/A";
+	  }
+  };
+
 export const erc20Abi = [
 	{
 	  constant: true,

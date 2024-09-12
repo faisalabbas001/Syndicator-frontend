@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
-
+import { useNavigate } from "react-router-dom"; 
 
 const DeactivateModal = ({ show, onClose }) => {
+  const navigate = useNavigate();
   if (!show) return null;
-
   return (
     <div className="relative z-[1000]" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="fixed inset-0 bg-gray-700 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -35,6 +35,7 @@ const DeactivateModal = ({ show, onClose }) => {
                 Not Now
               </button>
               <button
+                onClick={()=>navigate("/")}
                 type="button"
                 className="inline-flex w-[47%] justify-center rounded-md bg-[#fe4237] px-3 py-[13px] text-sm font-semibold text-black shadow-sm hover:bg-red-500 sm:ml-3 "
               >

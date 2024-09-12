@@ -28,18 +28,19 @@ import {
   writeContract,
   waitForTransactionReceipt,
 } from "@wagmi/core";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import {
   abi,
   contractAddress,
   erc20Abi,
   testTokenAddress,
-  formater
+  formater,
+  formaterWithInteger
 } from "../BlockChainContext/helper";
 import { nonceManager, parseEther } from "viem";
 import { config } from "../BlockChainContext/config";
 import toast from "react-hot-toast";
-import { getTokenImage, getTokenSymbol } from "../utils/ReuseFuntions";
+import { getTokenImage, getTokenSymbol,chainOptions } from "../utils/ReuseFuntions";
 let equivalent_asset;
 let OfferAmount1;
 let NoOfChunks;
@@ -116,179 +117,241 @@ const OfferMarketCard = () => {
     return values;
 }
 
-  const addUserGroup = async (scenario,offerId) => {
-    try {
-      if (groups.length > 0) {
-         console.log(offerId);
+const addUserGroup = async (scenario, offerId) => {
+  try {
+    if (groups.length > 0) {
+      console.log("Offer ID:", offerId.toString());
+
+      const { request } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: "create_user_group",
+        args: [includeSelf, groups],
+      });
+
+      const hash = await writeContract(config, request);
+      const transactionReceipt = await waitForTransactionReceipt(config, {
+        hash: hash,
+      });
+
+      console.log("Transaction Receipt:", transactionReceipt);
+
+      const data = await extractValues(transactionReceipt.logs[0]?.data);
+
+      // Check if data is valid
+      if (!data || data.length === 0) {
+        throw new Error("No data extracted from logs");
+      }
+
+      const groupId = Number(data[0]);   // Assuming it's a BigNumber
+      console.log("Group ID (as Number):", groupId);
+      console.log("Group ID (as BigNumber):", groupId.toString());
+
+      toast.success("Group created! Attaching offer...");
+
+      const validOfferId =Number(offerId); // Ensure offerId is a valid BigNumber
+      console.log("Valid Offer ID:", validOfferId);
+      const { request2 } = await simulateContract(config, {
+        abi: abi,
+        address: contractAddress,
+        functionName: "add_include_group",
+        args: [validOfferId, groupId],
+      });
+
+      const hash2 = await writeContract(config, request2);
+      const transactionReceipt2 = await waitForTransactionReceipt(config, {
+        hash: hash2,
+      });
+
+      console.log("Transaction Receipt 2:", transactionReceipt2);
+      toast.success("The offer is now private");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+
+const handleSubmit2 = async () => {
+  try {
+    if (equivalent_asset.length == 1) {
+      // Scenario 1
+      if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
+        // Scenario 1.1
         const { request } = await simulateContract(config, {
           abi: abi,
           address: contractAddress,
-          functionName: "create_user_group",
-          args: [includeSelf, groups],
+          functionName: "create_single_coin_offer",
+          args: [equivalent_asset[0], NoOfChunks],
+          value: parseEther(OfferAmount1.toString()),
         });
 
         const hash = await writeContract(config, request);
         const transactionReceipt = await waitForTransactionReceipt(config, {
-          // confirmations: 2,
           hash: hash,
         });
-        console.log(
-            transactionReceipt
-        );
-        const data =await extractValues(transactionReceipt.logs[0].data);
-        const groupId=Number(formater(data[0]));
-        console.log(typeof(groupId));
-        console.log(data[0]);
-        
-        toast.success("group created! attaching offer....");
 
+        console.log("Transaction Receipt Logs:", transactionReceipt.logs);
 
-        const { request2 } = await simulateContract(config, {
+        // Check if logs contain the expected topics
+        const logs = transactionReceipt.logs;
+        if (logs.length === 0) {
+          throw new Error("No logs found in transaction receipt.");
+        }
+
+        const offerIdTopic = logs[1]?.topics[1];
+        if (!offerIdTopic) {
+          throw new Error("Offer ID not found in transaction logs.");
+        }
+
+        // Convert the hex value to BigNumber
+        const offerId = BigNumber.from(offerIdTopic);
+        console.log("Offer ID (as BigNumber):", offerId.toString());
+
+        toast.success("Offer created successfully");
+
+        if (groups.length > 0) {
+          await addUserGroup("1.1", offerId);
+        }
+
+      } else {
+        // Scenario 1.2 (Token offer)
+        await tokenApproval(OfferAmount1, offeraddress1);
+
+        const { request } = await simulateContract(config, {
           abi: abi,
           address: contractAddress,
-          functionName: "add_include_group",
-          args: [offerId,groupId],
+          functionName: "create_single_token_offer",
+          args: [
+            equivalent_asset[0],
+            NoOfChunks,
+            parseEther(OfferAmount1),
+            offeraddress1,
+          ],
         });
 
-        const hash2 = await writeContract(config, request2);
-        const transactionReceipt2 = await waitForTransactionReceipt(config, {
-          // confirmations: 2,
+        const hash = await writeContract(config, request);
+        const transactionReceipt = await waitForTransactionReceipt(config, {
           hash: hash,
         });
-        console.log(transactionReceipt2);
-        toast.success("The offer is now private");
 
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+        console.log("Transaction Receipt Logs:", transactionReceipt.logs);
 
-  const handleSubmit2 = async () => {
-    try {
-      if (equivalent_asset.length == 1) {
-        //scenario 1
-        if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
-          //scenario 1.1
-          //  console.log(OfferAmount1);
-          //  console.log(equivalent_asset);
-          //  console.log(NoOfChunks);
-          const { request } = await simulateContract(config, {
-            abi: abi,
-            address: contractAddress,
-            functionName: "create_single_coin_offer",
-            args: [equivalent_asset[0], NoOfChunks],
-            value: parseEther(OfferAmount1.toString()),
-          });
-          //console.log("2")
-
-          const hash = await writeContract(config, request);
-          const transactionReceipt = await waitForTransactionReceipt(config, {
-            // confirmations: 2,
-            hash: hash,
-          });
-          const id=transactionReceipt.logs[1].topics[1];
-          const odDecimal = parseInt(Number(formater(id)));
-          console.log(
-            odDecimal
-          );
-          toast.success("Offer created successfully");
-
-          if (groups.length > 0) {
-            await addUserGroup("1.1",odDecimal);
-          }
-        } else {
-          //scenario 1.2
-          await tokenApproval(OfferAmount1,offeraddress1);
-          const { request } = await simulateContract(config, {
-            abi: abi,
-            address: contractAddress,
-            functionName: "create_single_token_offer",
-            args: [
-              equivalent_asset[0],
-              NoOfChunks,
-              parseEther(OfferAmount1),
-              offeraddress1,
-            ],
-          });
-
-          const hash = await writeContract(config, request);
-          const transactionReceipt = await waitForTransactionReceipt(config, {
-            // confirmations: 2,
-            hash: hash,
-          });
-          const id=transactionReceipt.logs[1].topics[1];
-          const odDecimal = parseInt(id, 16);
-          console.log(
-            odDecimal
-          );
-          toast.success("Offer created successfully");
-
-          if (groups.length > 0) {
-            await addUserGroup("1.2",odDecimal);
-          }
+        // Check if logs contain the expected topics
+        const logs = transactionReceipt.logs;
+        if (logs.length === 0) {
+          throw new Error("No logs found in transaction receipt.");
         }
-      } else if (equivalent_asset.length > 1) {
-        //scenario 2
-        if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
-          //scenario 2.1
-          const { request } = await simulateContract(config, {
-            abi: abi,
-            address: contractAddress,
-            functionName: "create_multi_coin_offer",
-            args: [equivalent_asset, NoOfChunks],
-            value: parseEther(OfferAmount1.toString()),
-          });
 
-          const hash = await writeContract(config, request);
-          const transactionReceipt = await waitForTransactionReceipt(config, {
-            // confirmations: 2,
-            hash: hash,
-          });
-          const id=transactionReceipt.logs[1].topics[1];
-          const odDecimal = parseInt(id, 16);
-          console.log(
-            odDecimal
-          );
-          toast.success("Offer created successfully");
-          if (groups.length > 0) {
-            await addUserGroup("2.1",odDecimal);
-          }
-        } else {
-          //scenario 2.2
-          await tokenApproval(OfferAmount1,offeraddress1);
-          const { request } = await simulateContract(config, {
-            abi: abi,
-            address: contractAddress,
-            functionName: "create_multi_token_offer",
-            args: [
-              equivalent_asset,
-              NoOfChunks,
-              parseEther(OfferAmount1),
-              offeraddress1,
-            ],
-          });
+        const offerIdTopic = logs[1]?.topics[1];
+        if (!offerIdTopic) {
+          throw new Error("Offer ID not found in transaction logs.");
+        }
 
-          const hash = await writeContract(config, request);
-          const transactionReceipt = await waitForTransactionReceipt(config, {
-            // confirmations: 2,
-            hash: hash,
-          });
-          const id=transactionReceipt.logs[1].topics[1];
-          const odDecimal = parseInt(id, 16);
-          console.log(
-            odDecimal
-          );
-          toast.success("Offer created successfully");
-          if (groups.length > 0) {
-            await addUserGroup("2.2",odDecimal);
-          }
+        // Convert the hex value to BigNumber
+        const offerId = BigNumber.from(offerIdTopic);
+        console.log("Offer ID (as BigNumber):", offerId.toString());
+
+        toast.success("Offer created successfully");
+
+        if (groups.length > 0) {
+          await addUserGroup("1.2", offerId);
         }
       }
-    } catch (error) {
-      console.log(error);
+
+    } else if (equivalent_asset.length > 1) {
+      // Scenario 2
+      if (offeraddress1 == "0x0000000000000000000000000000000000000000") {
+        // Scenario 2.1
+        const { request } = await simulateContract(config, {
+          abi: abi,
+          address: contractAddress,
+          functionName: "create_multi_coin_offer",
+          args: [equivalent_asset, NoOfChunks],
+          value: parseEther(OfferAmount1.toString()),
+        });
+
+        const hash = await writeContract(config, request);
+        const transactionReceipt = await waitForTransactionReceipt(config, {
+          hash: hash,
+        });
+
+        console.log("Transaction Receipt Logs:", transactionReceipt.logs);
+
+        // Check if logs contain the expected topics
+        const logs = transactionReceipt.logs;
+        if (logs.length === 0) {
+          throw new Error("No logs found in transaction receipt.");
+        }
+
+        const offerIdTopic = logs[1]?.topics[1];
+        if (!offerIdTopic) {
+          throw new Error("Offer ID not found in transaction logs.");
+        }
+
+        // Convert the hex value to BigNumber
+        const offerId = BigNumber.from(offerIdTopic);
+        console.log("Offer ID (as BigNumber):", offerId.toString());
+
+        toast.success("Offer created successfully");
+
+        if (groups.length > 0) {
+          await addUserGroup("2.1", offerId);
+        }
+
+      } else {
+        // Scenario 2.2 (Token offer)
+        await tokenApproval(OfferAmount1, offeraddress1);
+
+        const { request } = await simulateContract(config, {
+          abi: abi,
+          address: contractAddress,
+          functionName: "create_multi_token_offer",
+          args: [
+            equivalent_asset,
+            NoOfChunks,
+            parseEther(OfferAmount1),
+            offeraddress1,
+          ],
+        });
+
+        const hash = await writeContract(config, request);
+        const transactionReceipt = await waitForTransactionReceipt(config, {
+          hash: hash,
+        });
+
+        console.log("Transaction Receipt Logs:", transactionReceipt.logs);
+
+        // Check if logs contain the expected topics
+        const logs = transactionReceipt.logs;
+        if (logs.length === 0) {
+          throw new Error("No logs found in transaction receipt.");
+        }
+
+        const offerIdTopic = logs[1]?.topics[1];
+        if (!offerIdTopic) {
+          throw new Error("Offer ID not found in transaction logs.");
+        }
+
+        // Convert the hex value to BigNumber
+        const offerId = BigNumber.from(offerIdTopic);
+        console.log("Offer ID (as BigNumber):", offerId.toString());
+
+        toast.success("Offer created successfully");
+
+        if (groups.length > 0) {
+          await addUserGroup("2.2", offerId);
+        }
+      }
     }
-  };
+  } catch (error) {
+    console.error("Error during submission:", error);
+  }
+};
+
+
+
+
 
   const handleNextClick = () => {
     setShowModal(true);
@@ -339,7 +402,7 @@ const OfferMarketCard = () => {
                   onClick={handleSubmit2}
                   className="bg-[#ffc848] text-black px-4 py-2 rounded-md mt-2 mx-auto w-[92%] md:w-full  "
                 >
-                  Deposit 10 MACH7
+                  Deposit {" "} {OfferAmount1 + " " + offerSectionData.name}
                 </button>
               </>
             )}
@@ -746,48 +809,7 @@ const Card2 = () => {
   };
 
   // Array of chain options
-  const chainOptions = [
-    {
-      name: "ETH",
-      icon: "/assets/images/Ethereum_logo.png",
-      address: "0x0000000000000000000000000000000000000000",
-    },
-    {
-      name: "ABD",
-      icon: "/tokenImages/token3.png",
-      address: "0x2421f82ABfEe7C620C01B828a7B2E7141672c612",
-    },
-    {
-      name: "syn-test",
-      icon: "/assets/images/Ethereum_logo.png",
-      address: "0x043910B9D6Bf8AF5d088eA22948b8397f240fA4f",
-    },
-    {
-      name: "PEPE",
-      icon: "/tokenImages/token1.png",
-      address: "0x3797988B94E4bDb9767FC8BC0Ea4BE5e9e7a6931",
-    },
-    {
-      name: "SyndicatorLabs",
-      icon: "/tokenImages/token2.png",
-      address: "0x6aa31F147b206C3eC2E8D7c420e4F3ceb4D269Fb",
-    },
-    {
-      name: "Bitcoin",
-      icon: "/tokenImages/token3.png",
-      address: "0x806D0637Fbbfb4EB9efD5119B0895A5C7Cbc66e7",
-    },
-    {
-      name: "Doge",
-      icon: "/tokenImages/token4.png",
-      address: "0x9bc8388dD439fa3365B1F78A81242aDBB4677759",
-    },
-    {
-      name: "FI",
-      icon: "/tokenImages/token5.png",
-      address: "0xe6714a67cabd598882C42e2719908E648E734ec3",
-    },
-  ];
+
 
   //const chunk_num = 1n;
   //let amount = parseEther(ForAmount.toString());

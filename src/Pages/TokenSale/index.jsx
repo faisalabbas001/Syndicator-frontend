@@ -417,7 +417,7 @@ const TokenSale = () => {
               <p className="mb-2 text-stone-300 font-semibold">Creator: </p>
               <span className=" ms-auto text-gray-400">{stateData.owner.slice(0,4) + "..." + stateData.owner.slice(-4)}</span>
             </div>
-            <div className=" flex justify-between items-center">
+            {/* <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
                 Offer Price/Token:{' '}
               </p>
@@ -434,7 +434,7 @@ const TokenSale = () => {
                 Price Difference:{' '}
               </p>
               <span className=" ms-auto text-red-600">10% ABOVE MARKET</span>
-            </div>
+            </div> */}
             <div className=" flex justify-between items-center">
               <p className="mb-2 text-stone-300 font-semibold">
                 Minimum Fill:{' '}
