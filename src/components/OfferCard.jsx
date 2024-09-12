@@ -151,20 +151,24 @@ const addUserGroup = async (scenario, offerId) => {
 
       const validOfferId =Number(offerId); // Ensure offerId is a valid BigNumber
       console.log("Valid Offer ID:", validOfferId);
-      const { request2 } = await simulateContract(config, {
+      try{
+      const { request } = await simulateContract(config, {
         abi: abi,
         address: contractAddress,
         functionName: "add_include_group",
-        args: [validOfferId, groupId],
+        args: [offerId,groupId],
       });
 
-      const hash2 = await writeContract(config, request2);
+      const hash2 = await writeContract(config, request);
       const transactionReceipt2 = await waitForTransactionReceipt(config, {
         hash: hash2,
       });
 
       console.log("Transaction Receipt 2:", transactionReceipt2);
       toast.success("The offer is now private");
+    }catch(error){
+      console.log(error);
+    }
     }
   } catch (error) {
     console.error("Error:", error);
